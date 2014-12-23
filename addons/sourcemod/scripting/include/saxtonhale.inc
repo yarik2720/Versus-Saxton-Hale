@@ -110,6 +110,15 @@ forward Action:VSH_OnDoWeighdown();
  */
 forward Action:VSH_OnMusic(String:sound[], &Float:time);
 
+/**
+ * Called when VSH opens a panel to a client, stating they will be hale next round.
+ *
+ * @param client 	Client to be hale soon.
+ * 
+ * @return 			Plugin_Stop or Plugin_Handled to prevent panel being opened. Plugin_Continue to allow panel to be displayed.
+ */
+forward Action:VSH_OnHaleNext(client);
+
 public SharedPlugin:__pl_SaxtonHale = 
 {
 	name = "saxtonhale",
