@@ -450,6 +450,7 @@ new Handle:OnHaleJump;
 new Handle:OnHaleRage;
 new Handle:OnHaleWeighdown;
 new Handle:OnMusic;
+new Handle:OnHaleNext;
 
 //new Handle:hEquipWearable;
 //new Handle:hSetAmmoVelocity;
@@ -520,6 +521,7 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
     OnHaleRage = CreateGlobalForward("VSH_OnDoRage", ET_Hook, Param_FloatByRef);
     OnHaleWeighdown = CreateGlobalForward("VSH_OnDoWeighdown", ET_Hook);
     OnMusic = CreateGlobalForward("VSH_OnMusic", ET_Hook, Param_String, Param_FloatByRef);
+    OnHaleNext = CreateGlobalForward("VSH_OnHaleNext", ET_Hook, Param_Cell);
     RegPluginLibrary("saxtonhale");
 #if defined _steamtools_included
     MarkNativeAsOptional("Steam_SetGameDescription");
@@ -2373,6 +2375,17 @@ stock SkipHalePanelNotify(client, bool:newchoice = true)
         return;
     }
 
+    new Action:result = Plugin_Continue;
+    Call_StartForward(OnHaleNext);
+    Call_PushCell(client);
+    Call_Finish(_:result);
+
+    switch(result)
+    {
+        case Plugin_Stop, Plugin_Handled:
+            return;
+    }
+
     new Handle:panel = CreatePanel();
     decl String:s[256];
 
@@ -2386,7 +2399,7 @@ stock SkipHalePanelNotify(client, bool:newchoice = true)
     DrawPanelItem(panel, s);
     SendPanelToClient(panel, client, SkipHalePanelH, 30);
     CloseHandle(panel);
-
+    
     return;
 }
 public SkipHalePanelH(Handle:menu, MenuAction:action, param1, param2)
