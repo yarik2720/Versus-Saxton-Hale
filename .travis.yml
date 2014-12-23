@@ -13,12 +13,12 @@ install:
     - SMPACKAGE=`lynx -dump "$SMURL" | egrep -o "$SMPATTERN" | tail -1`
     - wget $SMPACKAGE
     - tar -xzf $(basename "$SMPACKAGE")
-    - ASHERKINURL="http://builds.limetech.org/files/"
-    - TF2ITEMSPATTERN="http:.*tf2items-.*-.*-linux.zip"
+    - ASHERKINURL="https://builds.limetech.org/files/"
+    - TF2ITEMSPATTERN="https:.*tf2items-.*-.*-linux.zip"
     - TF2ITEMSPACKAGE=`lynx -dump "$ASHERKINURL" | egrep -o "$TF2ITEMSPATTERN" | tail -1`
     - wget $TF2ITEMSPACKAGE
     - unzip $(basename "$TF2ITEMSPACKAGE")
-    - STEAMTOOLSPATTERN="http:.*steamtools-.*-git.*-.*-linux.zip"
+    - STEAMTOOLSPATTERN="https:.*steamtools-.*-git.*-.*-linux.zip"
     - STEAMTOOLSPACKAGE=`lynx -dump "$ASHERKINURL" | egrep -o "$STEAMTOOLSPATTERN" | tail -1`
     - wget $STEAMTOOLSPACKAGE
     - unzip $(basename "$STEAMTOOLSPACKAGE")
