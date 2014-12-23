@@ -2972,6 +2972,11 @@ public Action:MakeNoHale(Handle:hTimer, any:clientid)
                 TF2_RemoveWeaponSlot2(client, TFWeaponSlot_Secondary);
                 weapon = SpawnWeapon(client, "tf_weapon_lunchbox_drink", 163, 1, 0, "144 ; 2");
             }
+            case 1145:
+            {
+                TF2_RemoveWeaponSlot2(client, TFWeaponSlot_Secondary);
+                weapon = SpawnWeapon(client, "tf_weapon_lunchbox_drink", 163, 1, 0, "144 ; 2");
+            }
             case 57:
             {
                 TF2_RemoveWeaponSlot2(client, TFWeaponSlot_Secondary);
