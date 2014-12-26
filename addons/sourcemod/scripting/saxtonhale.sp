@@ -10,6 +10,8 @@
     New plugin thread on AlliedMods: https://forums.alliedmods.net/showthread.php?p=2167912
 */
 
+#define PLUGIN_VERSION "1.52"
+
 #pragma semicolon 1
 #include <sourcemod>
 #include <sdkhooks>
@@ -31,14 +33,14 @@
 //#define REQUIRE_PLUGIN
 
 #define TF_MAX_PLAYERS          34             //  Sourcemod supports up to 64 players? Too bad TF2 doesn't. 33 player server +1 for 0 (console/world)
-
-//#define ME 2048
 #define MAX_ENTITIES            2049           //  This is probably TF2 specific
+#define MAX_CENTER_TEXT         192            //  PrintCenterText()
 
-//#define EF_BONEMERGE            (1 << 0)
-//#define EF_BONEMERGE_FASTCULL   (1 << 7)
-
-#define PLUGIN_VERSION "1.52"
+// Player team values from Team Fortress 2... but without the annoying enum type thing
+#define TEAM_UNOWEN             0
+#define TEAM_SPEC               1
+#define TEAM_RED                2
+#define TEAM_BLU                3
 
 #define HALEHHH_TELEPORTCHARGETIME 2
 #define HALE_JUMPCHARGETIME 1
@@ -50,7 +52,15 @@
 
 #define EASTER_BUNNY_ON
 
-enum                                       //  For IsDate()
+// m_lifeState
+enum
+{
+    LifeState_Alive = 0,
+    LifeState_Dead = 2
+}
+
+//  For IsDate()
+enum
 {
     Month_None = 0,
     Month_Jan,
@@ -1568,34 +1578,11 @@ public Action:event_round_start(Handle:event, const String:name[], bool:dontBroa
 
     SetConVarInt(FindConVar("mp_teams_unbalance_limit"), 0);
 
-    if (GetTeamClientCount(HaleTeam) <= 0 || GetTeamClientCount(OtherTeam) <= 0)
+    if (FixUnbalancedTeams())
     {
-        if (IsValidClient(Hale))
-        {
-            if (GetClientTeam(Hale) != HaleTeam)
-            {
-                SetEntProp(Hale, Prop_Send, "m_lifeState", 2);
-                ChangeClientTeam(Hale, HaleTeam);
-                SetEntProp(Hale, Prop_Send, "m_lifeState", 0);
-                TF2_RespawnPlayer(Hale);
-            }
-        }
-        for (new i = 1; i <= MaxClients; i++)
-        {
-            if (IsValidClient(i) && i != Hale && GetClientTeam(i) != _:TFTeam_Spectator && GetClientTeam(i) != _:TFTeam_Unassigned)
-            {
-                if (GetClientTeam(i) != OtherTeam)
-                {
-                    SetEntProp(i, Prop_Send, "m_lifeState", 2);
-                    ChangeClientTeam(i, OtherTeam);
-                    SetEntProp(i, Prop_Send, "m_lifeState", 0);
-                    TF2_RespawnPlayer(i);
-                    TF2_RegeneratePlayer(i);
-                }
-            }
-        }
         return Plugin_Continue;
     }
+
     for (new i = 1; i <= MaxClients; i++)
     {
         if (!IsValidClient(i)) continue;
@@ -1663,6 +1650,22 @@ public Action:event_round_start(Handle:event, const String:name[], bool:dontBroa
     healthcheckused = 0;
     VSHRoundState = VSHRState_Waiting;
     return Plugin_Continue;
+}
+
+bool:FixUnbalancedTeams()
+{
+    if (GetTeamClientCount(HaleTeam) <= 0 || GetTeamClientCount(OtherTeam) <= 0)
+    {
+        for (new i = 1; i <= MaxClients; i++)
+        {
+            if (IsValidClient(i))
+            {
+                ChangeTeam(i, i==Hale?HaleTeam:OtherTeam);
+            }
+        }
+        return true;
+    }
+    return false;
 }
 
 SearchForItemPacks()
@@ -1924,13 +1927,7 @@ public Action:event_round_end(Handle:event, const String:name[], bool:dontBroadc
         }
         else
         {
-            if (GetClientTeam(Hale) != HaleTeam)
-            {
-                SetEntProp(Hale, Prop_Send, "m_lifeState", 2);
-                ChangeClientTeam(Hale, HaleTeam);
-                SetEntProp(Hale, Prop_Send, "m_lifeState", 0);
-                TF2_RespawnPlayer(Hale);
-            }
+            ChangeTeam(Hale, HaleTeam);
         }
         new top[3];
         Damage[0] = 0;
@@ -2087,6 +2084,7 @@ public Action:StartHaleTimer(Handle:hTimer)
         VSHRoundState = VSHRState_End;
         return Plugin_Continue;
     }
+    FixUnbalancedTeams();
     if (!IsPlayerAlive(Hale))
     {
         TF2_RespawnPlayer(Hale);
@@ -2331,13 +2329,7 @@ public Action:StartRound(Handle:hTimer)
         {
             TF2_RespawnPlayer(Hale);
         }
-        if (GetClientTeam(Hale) != HaleTeam)
-        {
-            SetEntProp(Hale, Prop_Send, "m_lifeState", 2);
-            ChangeClientTeam(Hale, HaleTeam);
-            SetEntProp(Hale, Prop_Send, "m_lifeState", 0);
-            TF2_RespawnPlayer(Hale);
-        }
+        ChangeTeam(Hale, HaleTeam);
         if (GetClientTeam(Hale) == HaleTeam)
         {
             new bool:pri = IsValidEntity(GetPlayerWeaponSlot(Hale, TFWeaponSlot_Primary));
@@ -2603,13 +2595,8 @@ public Action:MakeHale(Handle:hTimer)
     }
     TF2_RemovePlayerDisguise(Hale);
 
-    if (GetClientTeam(Hale) != HaleTeam)
-    {
-        SetEntProp(Hale, Prop_Send, "m_lifeState", 2);
-        ChangeClientTeam(Hale, HaleTeam);
-        SetEntProp(Hale, Prop_Send, "m_lifeState", 0);
-        TF2_RespawnPlayer(Hale);
-    }
+    ChangeTeam(Hale, HaleTeam);
+
     if (VSHRoundState < VSHRState_Waiting)
         return Plugin_Continue;
     if (!IsPlayerAlive(Hale))
@@ -2917,14 +2904,10 @@ public Action:MakeNoHale(Handle:hTimer, any:clientid)
         return Plugin_Continue;
 //  SetVariantString("");
 //  AcceptEntityInput(client, "SetCustomModel");
-    if (GetClientTeam(client) != OtherTeam)
-    {
-        SetEntProp(client, Prop_Send, "m_lifeState", 2);
-        ChangeClientTeam(client, OtherTeam);
-        SetEntProp(client, Prop_Send, "m_lifeState", 0);
-        TF2_RespawnPlayer(client);
-        TF2_RegeneratePlayer(client);   // Added fix by Chdata to correct team colors
-    }
+
+    ChangeTeam(client, OtherTeam);
+    //TF2_RegeneratePlayer(client);   // Added fix by Chdata to correct team colors Edit: I guess it's not necessary
+
 //  SetEntityRenderColor(client, 255, 255, 255, 255);
     if (!VSHRoundState && GetClientClasshelpinfoCookie(client) && !(VSHFlags[client] & VSHFLAG_CLASSHELPED))
         HelpPanel2(client);
@@ -3506,13 +3489,7 @@ public OnClientDisconnect(client)
                 }
                 if (IsValidClient(tHale))
                 {
-                    if (GetClientTeam(tHale) != HaleTeam)
-                    {
-                        SetEntProp(tHale, Prop_Send, "m_lifeState", 2);
-                        ChangeClientTeam(tHale, HaleTeam);
-                        SetEntProp(tHale, Prop_Send, "m_lifeState", 0);
-                        TF2_RespawnPlayer(tHale);
-                    }
+                    ChangeTeam(tHale, HaleTeam);
                 }
             }
             if (VSHRoundState == VSHRState_Active)
@@ -3532,13 +3509,7 @@ public OnClientDisconnect(client)
                 if (IsValidClient(tHale))
                 {
                     Hale = tHale;
-                    if (GetClientTeam(Hale) != HaleTeam)
-                    {
-                        SetEntProp(Hale, Prop_Send, "m_lifeState", 2);
-                        ChangeClientTeam(Hale, HaleTeam);
-                        SetEntProp(Hale, Prop_Send, "m_lifeState", 0);
-                        TF2_RespawnPlayer(Hale);
-                    }
+                    ChangeTeam(Hale, HaleTeam);
                     CreateTimer(0.1, MakeHale);
                     CPrintToChat(Hale, "{olive}[VSH]{default} Surprise! You're on NOW!");
                 }
@@ -3927,8 +3898,6 @@ public Action:HaleTimer(Handle:hTimer)
         TF2_RemoveCondition(Hale, TFCond_Dazed);
     new Float:speed = HaleSpeed + 0.7 * (100 - HaleHealth * 100 / HaleHealthMax);
     SetEntPropFloat(Hale, Prop_Send, "m_flMaxspeed", speed);
-//  SetEntProp(Hale, Prop_Data, "m_iHealth", HaleHealth);
-//  SetEntProp(Hale, Prop_Send, "m_iHealth", HaleHealth);
     if (HaleHealth <= 0 && IsPlayerAlive(Hale)) HaleHealth = 1;
     SetEntityHealth(Hale, HaleHealth);
     SetHudTextParams(-1.0, 0.77, 0.35, 255, 255, 255, 255);
@@ -4458,7 +4427,9 @@ public Action:UseRage(Handle:hTimer, any:dist)
                 AcceptEntityInput(i, "RemoveHealth");
             }
             else
+            {
                 SetEntProp(i, Prop_Send, "m_iHealth", GetEntProp(i, Prop_Send, "m_iHealth")/2);
+            }
             CreateTimer(8.0, EnableSG, EntIndexToEntRef(i));
         }
     }
@@ -5142,7 +5113,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                 }
                 if (damagecustom == TF_CUSTOM_TELEFRAG) //if (!IsValidEntity(weapon) && (damagetype & DMG_CRUSH) == DMG_CRUSH && damage == 1000.0)    //THIS IS A TELEFRAG
                 {
-                    if (!IsPlayerAlive(attacker))
+                    if (!IsPlayerAlive(attacker)) // Is this even possible?
                     {
                         damage = 1.0;
                         return Plugin_Changed;
@@ -5281,18 +5252,11 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                         }
                     }
                     case 317: SpawnSmallHealthPackAt(client, GetClientTeam(attacker));
-                    case 214:
+                    case 214: // Powerjack
                     {
-                        new health = GetClientHealth(attacker);
-                        new max = GetEntProp(attacker, Prop_Data, "m_iMaxHealth");
-                        new newhealth = health+25;
-                        if (health < max+50)
-                        {
-                            if (newhealth > max+50) newhealth = max+50;
-                            SetEntProp(attacker, Prop_Data, "m_iHealth", newhealth);
-                            SetEntProp(attacker, Prop_Send, "m_iHealth", newhealth);
-                        }
-                        if (TF2_IsPlayerInCondition(attacker, TFCond_OnFire)) TF2_RemoveCondition(attacker, TFCond_OnFire);
+                        AddPlayerHealth(attacker, 25, 50);
+                        RemoveCond(attacker, TFCond_OnFire);
+                        return Plugin_Changed;
                     }
                     case 594: // Phlog
                     {
@@ -5307,16 +5271,9 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                         SetEntProp(weapon, Prop_Send, "m_bIsBloody", 1);
                         if (GetEntProp(attacker, Prop_Send, "m_iKillCountSinceLastDeploy") < 1)
                             SetEntProp(attacker, Prop_Send, "m_iKillCountSinceLastDeploy", 1);
-                        new health = GetClientHealth(attacker);
-                        new max = GetEntProp(attacker, Prop_Data, "m_iMaxHealth");
-                        new newhealth = health+35;
-                        if (health < max+25)
-                        {
-                            if (newhealth > max+25) newhealth = max+25;
-                            SetEntProp(attacker, Prop_Data, "m_iHealth", newhealth);
-                            SetEntProp(attacker, Prop_Send, "m_iHealth", newhealth);
-                        }
-                        if (TF2_IsPlayerInCondition(attacker, TFCond_OnFire)) TF2_RemoveCondition(attacker, TFCond_OnFire);
+
+                        AddPlayerHealth(attacker, 35, 25);
+                        RemoveCond(attacker, TFCond_OnFire);
                     }
                     case 61, 1006:  //Ambassador does 2.5x damage on headshot
                     {
@@ -5345,10 +5302,10 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                             EmitSoundToClient(client, "weapons/barret_arm_zap.wav");
                         }
                     }*/
-                    case 656:
+                    case 656: // Mittens
                     {
                         CreateTimer(0.1, Timer_StopTickle, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
-                        if (TF2_IsPlayerInCondition(attacker, TFCond_Dazed)) TF2_RemoveCondition(attacker, TFCond_Dazed);
+                        RemoveCond(attacker, TFCond_Dazed);
                     }
                 }
                 //VoiDeD's Caber-backstab code. To be added with a few special modifications in 1.40+
@@ -5456,16 +5413,11 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                         CreateTimer(0.3, Timer_DisguiseBackstab, GetClientUserId(attacker));
                     }*/
 
-                    if (wepindex == 356)
+                    if (wepindex == 356) // Kunai
                     {
-                        new health = GetClientHealth(attacker) + 180;
-
-                        if (health > 270) health = 270;
-
-                        SetEntProp(attacker, Prop_Data, "m_iHealth", health);
-                        SetEntProp(attacker, Prop_Send, "m_iHealth", health);
+                        AddPlayerHealth(attacker, 180, 270, true);
                     }
-                    if (wepindex == 461)    //Big Earner gives full cloak on backstab
+                    if (wepindex == 461) // Big Earner gives full cloak on backstab
                     {
                         SetEntPropFloat(attacker, Prop_Send, "m_flCloakMeter", 100.0);
                     }
@@ -7191,6 +7143,9 @@ public Timer_SetEggBomb(any:ref)
         SetEntityRenderColor(entity, 255, 255, 255, 0);
     }
 }
+
+//#define EF_BONEMERGE            (1 << 0)
+//#define EF_BONEMERGE_FASTCULL   (1 << 7)
 /*stock CreateVM(client, String:model[])
 {
     new ent = CreateEntityByName("tf_wearable_vm");
@@ -7420,7 +7375,16 @@ public Native_GetDamage(Handle:plugin, numParams)
     AKA, stuff that could be useful in any plugin / are not specific to VSH
 */
 
-#define MAX_CENTER_TEXT         192            //  PrintCenterText()
+// True if they weren't in the condition and were set to it.
+stock bool:InsertCond(iClient, TFCond:iCond, Float:flDuration = TFCondDuration_Infinite)
+{
+    if (!TF2_IsPlayerInCondition(iClient, iCond))
+    {
+        TF2_AddCondition(iClient, iCond, flDuration);
+        return true;
+    }
+    return false;
+}
 
 // True if the condition was removed.
 stock bool:RemoveCond(iClient, TFCond:iCond)
@@ -7745,17 +7709,12 @@ stock GetClientCloakIndex(client)
     return GetEntProp(wep, Prop_Send, "m_iItemDefinitionIndex");
 }
 
-stock IncrementHeadCount(client)
+stock IncrementHeadCount(iClient)
 {
-    if (!TF2_IsPlayerInCondition(client, TFCond_DemoBuff)) TF2_AddCondition(client, TFCond_DemoBuff, -1.0);
-    new decapitations = GetEntProp(client, Prop_Send, "m_iDecapitations");
-    SetEntProp(client, Prop_Send, "m_iDecapitations", decapitations+1);
-    new health = GetClientHealth(client);
-//  health += (decapitations >= 4 ? 10 : 15);
-    health += 15;
-    SetEntProp(client, Prop_Data, "m_iHealth", health);
-    SetEntProp(client, Prop_Send, "m_iHealth", health);
-    TF2_AddCondition(client, TFCond_SpeedBuffAlly, 0.01);   //recalc their speed
+    InsertCond(iClient, TFCond_DemoBuff);
+    SetEntProp(iClient, Prop_Send, "m_iDecapitations", GetEntProp(iClient, Prop_Send, "m_iDecapitations") + 1);
+    AddPlayerHealth(iClient, 15, 900000, true);             //  The old version of this allowed infinite health gain... so ;v
+    TF2_AddCondition(iClient, TFCond_SpeedBuffAlly, 0.01);  //  Recalcalculate their speed
 }
 
 stock SwitchToOtherWeapon(client)
@@ -7900,6 +7859,53 @@ stock FindEntityByClassname2(startEnt, const String:classname[])
     /* If startEnt isn't valid shifting it back to the nearest valid one */
     while (startEnt > -1 && !IsValidEntity(startEnt)) startEnt--;
     return FindEntityByClassname(startEnt, classname);
+}
+
+/*
+    @summary
+        Changes a living player's team without killing/moving them
+        I think it respawns them at spawn though.
+
+    @params
+        iClient should be validated before using this
+        iTeam should be either 2 or 3
+
+    @return
+        false if not changed
+        true if changed
+
+        TODO: -1 not changed, 0 if changed with no respawn, 1 if changed with respawn
+
+*/
+stock ChangeTeam(iClient, iTeam) // iTeam should never be less than 2
+{
+    new iOldTeam = GetClientTeam(iClient);
+
+    if (iOldTeam != iTeam && iOldTeam >= TEAM_RED)
+    {
+        SetEntProp(iClient, Prop_Send, "m_lifeState", LifeState_Dead);
+        ChangeClientTeam(iClient, iTeam);
+        SetEntProp(iClient, Prop_Send, "m_lifeState", LifeState_Alive);
+        TF2_RespawnPlayer(iClient);
+    }
+}
+
+stock any:min(any:a,any:b) { return (a < b) ? a : b; }
+
+/*
+    Player health adder
+    By: Chdata
+*/
+stock AddPlayerHealth(iClient, iAdd, iOverheal = 0, bStaticMax = false)
+{
+    new iHealth = GetClientHealth(iClient);
+    new iNewHealth = iHealth + iAdd;
+    new iMax = bStaticMax ? iOverheal : GetEntProp(iClient, Prop_Data, "m_iMaxHealth") + iOverheal;
+    if (iHealth < iMax)
+    {
+        iNewHealth = min(iNewHealth, iMax);
+        SetEntityHealth(iClient, iNewHealth);
+    }
 }
 
 #endinput
