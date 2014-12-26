@@ -291,8 +291,8 @@ new Handle:jumpHUD;
 new Handle:rageHUD;
 new Handle:healthHUD;
 new Handle:infoHUD;
-new bool:Enabled = false;
-new bool:Enabled2 = false;
+new bool:g_bEnabled = false;
+new bool:g_bAreEnoughPlayersPlaying = false;
 new Float:HaleSpeed = 340.0;
 new PointDelay = 6;
 new RageDMG = 3500;
@@ -722,7 +722,7 @@ public bool:HaleTargetFilter(const String:pattern[], Handle:clients)
     {
         if (IsValidClient(client) && FindValueInArray(clients, client) == -1)
         {
-            if (Enabled && client == Hale)
+            if (g_bEnabled && client == Hale)
             {
                 if (!non)
                 {
@@ -799,8 +799,8 @@ public OnConfigsExecuted()
         }
 #endif
 
-        Enabled = true;
-        Enabled2 = true;
+        g_bEnabled = true;
+        g_bAreEnoughPlayersPlaying = true;
         if (Announce > 1.0)
         {
             CreateTimer(Announce, Timer_Announce, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
@@ -808,8 +808,8 @@ public OnConfigsExecuted()
     }
     else
     {
-        Enabled2 = false;
-        Enabled = false;
+        g_bAreEnoughPlayersPlaying = false;
+        g_bEnabled = false;
     }
 }
 public OnMapStart()
@@ -835,7 +835,7 @@ public OnMapStart()
 }
 public OnMapEnd()
 {
-    if (Enabled2 || Enabled)
+    if (g_bAreEnoughPlayersPlaying || g_bEnabled)
     {
         SetConVarInt(FindConVar("tf_arena_use_queue"), tf_arena_use_queue);
         SetConVarInt(FindConVar("mp_teams_unbalance_limit"), mp_teams_unbalance_limit);
@@ -1212,7 +1212,7 @@ public CvarChange(Handle:convar, const String:oldValue[], const String:newValue[
     {
         if (GetConVarBool(convar) && IsSaxtonHaleMap())
         {
-            Enabled2 = true;
+            g_bAreEnoughPlayersPlaying = true;
 #if defined _steamtools_included
             if (steamtools)
             {
@@ -1228,7 +1228,7 @@ public Action:Timer_Announce(Handle:hTimer)
 {
     static announcecount=-1;
     announcecount++;
-    if (Announce > 1.0 && Enabled2)
+    if (Announce > 1.0 && g_bAreEnoughPlayersPlaying)
     {
         switch (announcecount)
         {
@@ -1258,7 +1258,7 @@ public Action:Timer_Announce(Handle:hTimer)
 }
 /*public Action:OnGetGameDescription(String:gameDesc[64])
 {
-    if (Enabled2)
+    if (g_bAreEnoughPlayersPlaying)
     {
         Format(gameDesc, sizeof(gameDesc), "VS Saxton Hale (%s)", haleversiontitles[maxversion]);
         return Plugin_Changed;
@@ -1458,15 +1458,15 @@ public Action:event_round_start(Handle:event, const String:name[], bool:dontBroa
     if (!GetConVarBool(cvarEnabled))
     {
 #if defined _steamtools_included
-        if (Enabled2 && steamtools)
+        if (g_bAreEnoughPlayersPlaying && steamtools)
         {
             Steam_SetGameDescription("Team Fortress");
         }
 #endif
-        Enabled2 = false;
+        g_bAreEnoughPlayersPlaying = false;
     }
-    Enabled = Enabled2;
-    if (CheckNextSpecial() && !Enabled) //QueuePanelH(Handle:0, MenuAction:0, 9001, 0) is HaleEnabled
+    g_bEnabled = g_bAreEnoughPlayersPlaying;
+    if (CheckNextSpecial() && !g_bEnabled) //QueuePanelH(Handle:0, MenuAction:0, 9001, 0) is HaleEnabled
         return Plugin_Continue;
     if (FileExists("bNextMapToHale"))
         DeleteFile("bNextMapToHale");
@@ -1542,20 +1542,20 @@ public Action:event_round_start(Handle:event, const String:name[], bool:dontBroa
     if (GetClientCount() <= 1 || playing < 2)
     {
         CPrintToChatAll("{olive}[VSH]{default} %t", "vsh_needmoreplayers");
-        Enabled = false;
+        g_bEnabled = false;
         VSHRoundState = VSHRState_Disabled;
         SetControlPoint(true);
         return Plugin_Continue;
     }
     else if (RoundCount >= 0 && GetConVarBool(cvarFirstRound)) // This line was breaking the first round sometimes
     {
-        Enabled = true;
+        g_bEnabled = true;
     }
     else if (RoundCount <= 0 && !GetConVarBool(cvarFirstRound))
     {
         CPrintToChatAll("{olive}[VSH]{default} %t", "vsh_first_round");
 
-        Enabled = false;
+        g_bEnabled = false;
         VSHRoundState = VSHRState_Disabled;
         SetArenaCapEnableTime(60.0);
 
@@ -1568,7 +1568,7 @@ public Action:event_round_start(Handle:event, const String:name[], bool:dontBroa
 
     SetConVarInt(FindConVar("mp_teams_unbalance_limit"), 0);
 
-    if (GetTeamClientCount(TFTeam_Blue) <= 0 || GetTeamClientCount(TFTeam_Red) <= 0)
+    if (GetTeamClientCount(HaleTeam) <= 0 || GetTeamClientCount(OtherTeam) <= 0)
     {
         if (IsValidClient(Hale))
         {
@@ -1607,7 +1607,7 @@ public Action:event_round_start(Handle:event, const String:name[], bool:dontBroa
     if (tHale == -1)
     {
         CPrintToChatAll("{olive}[VSH]{default} %t", "vsh_needmoreplayers");
-        Enabled = false;
+        g_bEnabled = false;
         VSHRoundState = VSHRState_Disabled;
         SetControlPoint(true);
         return Plugin_Continue;
@@ -1672,16 +1672,16 @@ SearchForItemPacks()
     decl Float:pos[3];
     while ((ent = FindEntityByClassname2(ent, "item_ammopack_full")) != -1)
     {
-        SetEntProp(ent, Prop_Send, "m_iTeamNum", Enabled?OtherTeam:0, 4);
+        SetEntProp(ent, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
 
-        if (Enabled)
+        if (g_bEnabled)
         {
             GetEntPropVector(ent, Prop_Send, "m_vecOrigin", pos);
             AcceptEntityInput(ent, "Kill");
             new ent2 = CreateEntityByName("item_ammopack_small");
             TeleportEntity(ent2, pos, NULL_VECTOR, NULL_VECTOR);
             DispatchSpawn(ent2);
-            SetEntProp(ent2, Prop_Send, "m_iTeamNum", Enabled?OtherTeam:0, 4);
+            SetEntProp(ent2, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
             foundAmmo = true;
         }
         
@@ -1689,16 +1689,16 @@ SearchForItemPacks()
     ent = -1;
     while ((ent = FindEntityByClassname2(ent, "item_ammopack_medium")) != -1)
     {
-        SetEntProp(ent, Prop_Send, "m_iTeamNum", Enabled?OtherTeam:0, 4);
+        SetEntProp(ent, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
 
-        if (Enabled)
+        if (g_bEnabled)
         {
             GetEntPropVector(ent, Prop_Send, "m_vecOrigin", pos);
             AcceptEntityInput(ent, "Kill");
             new ent2 = CreateEntityByName("item_ammopack_small");
             TeleportEntity(ent2, pos, NULL_VECTOR, NULL_VECTOR);
             DispatchSpawn(ent2);
-            SetEntProp(ent2, Prop_Send, "m_iTeamNum", Enabled?OtherTeam:0, 4);
+            SetEntProp(ent2, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
         }
         
         foundAmmo = true;
@@ -1706,25 +1706,25 @@ SearchForItemPacks()
     ent = -1;
     while ((ent = FindEntityByClassname2(ent, "Item_ammopack_small")) != -1)
     {
-        SetEntProp(ent, Prop_Send, "m_iTeamNum", Enabled?OtherTeam:0, 4);
+        SetEntProp(ent, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
         foundAmmo = true;
     }
     ent = -1;
     while ((ent = FindEntityByClassname2(ent, "item_healthkit_small")) != -1)
     {
-        SetEntProp(ent, Prop_Send, "m_iTeamNum", Enabled?OtherTeam:0, 4);
+        SetEntProp(ent, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
         foundHealth = true;
     }
     ent = -1;
     while ((ent = FindEntityByClassname2(ent, "item_healthkit_medium")) != -1)
     {
-        SetEntProp(ent, Prop_Send, "m_iTeamNum", Enabled?OtherTeam:0, 4);
+        SetEntProp(ent, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
         foundHealth = true;
     }
     ent = -1;
     while ((ent = FindEntityByClassname2(ent, "item_healthkit_large")) != -1)
     {
-        SetEntProp(ent, Prop_Send, "m_iTeamNum", Enabled?OtherTeam:0, 4);
+        SetEntProp(ent, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
         foundHealth = true;
     }
     if (!foundAmmo) SpawnRandomAmmo();
@@ -1733,10 +1733,10 @@ SearchForItemPacks()
 
 SpawnRandomAmmo()
 {
-    new iEnt;
+    new iEnt = MaxClients + 1;
     decl Float:vPos[3];
     decl Float:vAng[3];
-    DOWHILE_ENTFOUND(iEnt, "info_player_teamspawn")
+    while ((iEnt = FindEntityByClassname2(iEnt, "info_player_teamspawn")) != -1)
     {
         if (GetRandomInt(0, 4))
         {
@@ -1756,10 +1756,10 @@ SpawnRandomAmmo()
 
 SpawnRandomHealth()
 {
-    new iEnt;
+    new iEnt = MaxClients + 1;
     decl Float:vPos[3];
     decl Float:vAng[3];
-    DOWHILE_ENTFOUND(iEnt, "info_player_teamspawn")
+    while ((iEnt = FindEntityByClassname2(iEnt, "info_player_teamspawn")) != -1)
     {
         if (GetRandomInt(0, 4))
         {
@@ -1804,7 +1804,7 @@ public Action:Timer_CheckDoors(Handle:hTimer)
         return Plugin_Stop;
     }
 
-    if ((!Enabled && VSHRoundState != VSHRState_Disabled) || (Enabled && VSHRoundState != VSHRState_Active)) return Plugin_Continue;
+    if ((!g_bEnabled && VSHRoundState != VSHRState_Disabled) || (g_bEnabled && VSHRoundState != VSHRState_Active)) return Plugin_Continue;
     new ent = -1;
     while ((ent = FindEntityByClassname2(ent, "func_door")) != -1)
     {
@@ -1856,7 +1856,7 @@ public Action:event_round_end(Handle:event, const String:name[], bool:dontBroadc
         CPrintToChatAll("{olive}[VSH]{default} %t", "vsh_nextmap", s2);
     }
     RoundCount++;
-    if (!Enabled)
+    if (!g_bEnabled)
     {
         return Plugin_Continue;
     }
@@ -2202,7 +2202,7 @@ public Action:Timer_MusicTheme(Handle:timer, any:pack)
     ResetPack(pack);
     ReadPackString(pack, sound, sizeof(sound));
     new Float:time = ReadPackFloat(pack);
-    if (Enabled && VSHRoundState == VSHRState_Active)
+    if (g_bEnabled && VSHRoundState == VSHRState_Active)
     {
 /*      new String:sound[PLATFORM_MAX_PATH] = "";
         switch (Special)
@@ -2383,9 +2383,9 @@ public Action:Timer_SkipHalePanel(Handle:hTimer)
     while (i < 3 && j < TF_MAX_PLAYERS);
 }
 
-SkipHalePanelNotify(client, bool:newchoice = true)
+SkipHalePanelNotify(client) // , bool:newchoice = true
 {
-    if (!Enabled || !IsValidClient(client) || IsVoteInProgress())
+    if (!g_bEnabled || !IsValidClient(client) || IsVoteInProgress())
     {
         return;
     }
@@ -2669,7 +2669,7 @@ public Action:MakeHale(Handle:hTimer)
 }
 public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefinitionIndex, &Handle:hItem)
 {
-//    if (!Enabled) return Plugin_Continue; // This messes up the first round sometimes
+//    if (!g_bEnabled) return Plugin_Continue; // This messes up the first round sometimes
     if (RoundCount <= 0 && !GetConVarBool(cvarFirstRound)) return Plugin_Continue;
 
 //  if (client == Hale) return Plugin_Continue;
@@ -3098,7 +3098,7 @@ public Action:Timer_NoHonorBound(Handle:timer, any:userid)
 }
 public Action:event_destroy(Handle:event, const String:name[], bool:dontBroadcast)
 {
-    if (Enabled)
+    if (g_bEnabled)
     {
         new attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
         new customkill = GetEventInt(event, "customkill");
@@ -3121,7 +3121,7 @@ public Action:event_destroy(Handle:event, const String:name[], bool:dontBroadcas
 }
 public Action:event_changeclass(Handle:event, const String:name[], bool:dontBroadcast)
 {
-    if (!Enabled)
+    if (!g_bEnabled)
         return Plugin_Continue;
     new client = GetClientOfUserId(GetEventInt(event, "userid"));
     if (client == Hale)
@@ -3147,7 +3147,7 @@ public Action:event_changeclass(Handle:event, const String:name[], bool:dontBroa
 }
 public Action:event_uberdeployed(Handle:event, const String:name[], bool:dontBroadcast)
 {
-    if (!Enabled)
+    if (!g_bEnabled)
         return Plugin_Continue;
     new client = GetClientOfUserId(GetEventInt(event, "userid"));
     new String:s[64];
@@ -3221,7 +3221,7 @@ public Action:Command_GetHPCmd(client, args)
 }
 public Action:Command_GetHP(client)
 {
-    if (!Enabled || VSHRoundState != VSHRState_Active)
+    if (!g_bEnabled || VSHRoundState != VSHRState_Active)
         return Plugin_Continue;
     if (client == Hale)
     {
@@ -3339,13 +3339,13 @@ public Action:Command_MakeNextSpecial(client, args)
 }
 public Action:Command_NextHale(client, args)
 {
-    if (Enabled)
+    if (g_bEnabled)
         CreateTimer(0.2, MessageTimer);
     return Plugin_Continue;
 }
 public Action:Command_HaleSelect(client, args)
 {
-    if (!Enabled2)
+    if (!g_bAreEnoughPlayersPlaying)
         return Plugin_Continue;
     if (args < 1)
     {
@@ -3370,7 +3370,7 @@ public Action:Command_HaleSelect(client, args)
 }
 public Action:Command_Points(client, args)
 {
-    if (!Enabled2)
+    if (!g_bAreEnoughPlayersPlaying)
         return Plugin_Continue;
     if (args != 2)
     {
@@ -3422,7 +3422,7 @@ StopHaleMusic(client)
 }
 public Action:Command_StopMusic(client, args)
 {
-    if (!Enabled2)
+    if (!g_bAreEnoughPlayersPlaying)
         return Plugin_Continue;
     for (new i = 1; i <= MaxClients; i++)
     {
@@ -3434,12 +3434,12 @@ public Action:Command_StopMusic(client, args)
 }
 public Action:Command_Point_Disable(client, args)
 {
-    if (Enabled) SetControlPoint(false);
+    if (g_bEnabled) SetControlPoint(false);
     return Plugin_Handled;
 }
 public Action:Command_Point_Enable(client, args)
 {
-    if (Enabled) SetControlPoint(true);
+    if (g_bEnabled) SetControlPoint(true);
     return Plugin_Handled;
 }
 
@@ -3457,7 +3457,7 @@ SetControlPoint(bool:enable)
     }
 }
 
-ForceHale(admin, client, bool:hidden, bool:forever = false)
+stock ForceHale(admin, client, bool:hidden, bool:forever = false)
 {
     if (forever)
         Hale = client;
@@ -3486,7 +3486,7 @@ public OnClientDisconnect(client)
     AirDamage[client] = 0;
     uberTarget[client] = -1;
     VSHFlags[client] = 0;
-    if (Enabled)
+    if (g_bEnabled)
     {
         if (client == Hale)
         {
@@ -3579,7 +3579,7 @@ public Action:event_player_spawn(Handle:event, const String:name[], bool:dontBro
 {
     new client = GetClientOfUserId(GetEventInt(event, "userid"));
     if (!IsValidClient(client, false)) return Plugin_Continue;
-    if (!Enabled) return Plugin_Continue;
+    if (!g_bEnabled) return Plugin_Continue;
     SetVariantString("");
     AcceptEntityInput(client, "SetCustomModel");
     if (client == Hale && VSHRoundState < VSHRState_End && VSHRoundState != VSHRState_Disabled) CreateTimer(0.1, MakeHale);
@@ -3608,7 +3608,7 @@ public Action:event_player_spawn(Handle:event, const String:name[], bool:dontBro
 }
 public Action:OnPlayerRunCmd(client, &buttons, &impulse, Float:vel[3], Float:angles[3], &weapon)
 {
-    if (Enabled && client == Hale)
+    if (g_bEnabled && client == Hale)
     {
         if (Special == VSHSpecial_HHH)
         {
@@ -4233,7 +4233,7 @@ public Action:Timer_GravityCat(Handle:timer, any:userid)
 }
 public Action:Destroy(client, const String:command[], argc)
 {
-    if (!Enabled || client == Hale)
+    if (!g_bEnabled || client == Hale)
         return Plugin_Continue;
     if (IsValidClient(client) && TF2_GetPlayerClass(client) == TFClass_Engineer && TF2_IsPlayerInCondition(client, TFCond_Taunting) && GetIndexOfWeaponSlot(client, TFWeaponSlot_Melee) == 589)
         return Plugin_Handled;
@@ -4278,7 +4278,7 @@ public Action:cdVoiceMenu(iClient, const String:sCommand[], iArgc)
 
 public Action:DoTaunt(client, const String:command[], argc)
 {
-    if (!Enabled || (client != Hale))
+    if (!g_bEnabled || (client != Hale))
         return Plugin_Continue;
 
     if (bNoTaunt) // Prevent double-tap rages
@@ -4390,7 +4390,7 @@ public Action:Timer_NoTaunting(Handle:timer)
 
 public Action:DoSuicide(client, const String:command[], argc)
 {
-    if (Enabled && (VSHRoundState == VSHRState_Waiting || VSHRoundState == VSHRState_Active))
+    if (g_bEnabled && (VSHRoundState == VSHRState_Waiting || VSHRoundState == VSHRState_Active))
     {
         if (client == Hale && bTenSecStart[0])
         {
@@ -4404,7 +4404,7 @@ public Action:DoSuicide(client, const String:command[], argc)
 }
 public Action:DoSuicide2(client, const String:command[], argc)
 {
-    if (Enabled && client == Hale && bTenSecStart[0])
+    if (g_bEnabled && client == Hale && bTenSecStart[0])
     {
         CPrintToChat(client, "You can't change teams this early.");
         return Plugin_Handled;
@@ -4538,7 +4538,7 @@ public Action:UseBowRage(Handle:hTimer)
 public Action:event_player_death(Handle:event, const String:name[], bool:dontBroadcast)
 {
     decl String:s[PLATFORM_MAX_PATH];
-    if (!Enabled)
+    if (!g_bEnabled)
         return Plugin_Continue;
     new client = GetClientOfUserId(GetEventInt(event, "userid"));
     if (!IsValidClient(client))
@@ -4864,7 +4864,7 @@ DissolveRagdoll(ragdoll)
 }*/
 public Action:event_deflect(Handle:event, const String:name[], bool:dontBroadcast)
 {
-    if (!Enabled) return Plugin_Continue;
+    if (!g_bEnabled) return Plugin_Continue;
     new deflector = GetClientOfUserId(GetEventInt(event, "userid"));
     new owner = GetClientOfUserId(GetEventInt(event, "ownerid"));
     new weaponid = GetEventInt(event, "weaponid");
@@ -4975,7 +4975,7 @@ public Action:CheckAlivePlayers(Handle:hTimer)
 }
 public Action:event_hurt(Handle:event, const String:name[], bool:dontBroadcast)
 {
-    if (!Enabled)
+    if (!g_bEnabled)
         return Plugin_Continue;
     new client = GetClientOfUserId(GetEventInt(event, "userid"));
     new attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
@@ -5036,7 +5036,7 @@ public Action:event_hurt(Handle:event, const String:name[], bool:dontBroadcast)
 }
 public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damagetype, &weapon, Float:damageForce[3], Float:damagePosition[3], damagecustom)
 {
-    if (!Enabled || !IsValidEdict(attacker) || ((attacker <= 0) && (client == Hale)) || TF2_IsPlayerInCondition(client, TFCond_Ubercharged))
+    if (!g_bEnabled || !IsValidEdict(attacker) || ((attacker <= 0) && (client == Hale)) || TF2_IsPlayerInCondition(client, TFCond_Ubercharged))
         return Plugin_Continue;
     if (VSHRoundState == VSHRState_Waiting && (client == Hale || (client != attacker && attacker != Hale)))
     {
@@ -5738,7 +5738,7 @@ stock RandomlyDisguise(client)  //original code was mecha's, but the original co
 }*/
 public Action:TF2_CalcIsAttackCritical(client, weapon, String:weaponname[], &bool:result)
 {
-    if (!IsValidClient(client, false) || !Enabled) return Plugin_Continue;
+    if (!IsValidClient(client, false) || !g_bEnabled) return Plugin_Continue;
 
     // HHH can climb walls
     if (IsValidEntity(weapon) && Special == VSHSpecial_HHH && client == Hale && HHHClimbCount <= 9 && VSHRoundState > VSHRState_Waiting)
@@ -5936,7 +5936,7 @@ public Action:QueuePanelCmd(client, Args)
 }
 public Action:QueuePanel(client)
 {
-    if (!Enabled2)
+    if (!g_bAreEnoughPlayersPlaying)
         return Plugin_Continue;
     new Handle:panel = CreatePanel();
     decl String:s[512];
@@ -5945,7 +5945,7 @@ public Action:QueuePanel(client)
     new bool:added[TF_MAX_PLAYERS];
     new tHale = Hale;
     if (Hale >= 0) added[Hale] = true;
-    if (!Enabled) DrawPanelItem(panel, "None");
+    if (!g_bEnabled) DrawPanelItem(panel, "None");
     else if (IsValidClient(tHale))
     {
         Format(s, sizeof(s), "%N - %i", tHale, GetClientQueuePoints(tHale));
@@ -6006,7 +6006,7 @@ public TurnToZeroPanelH(Handle:menu, MenuAction:action, param1, param2)
 }
 public Action:ResetQueuePointsCmd(client, args)
 {
-    if (!Enabled2)
+    if (!g_bAreEnoughPlayersPlaying)
         return Plugin_Continue;
     if (!IsValidClient(client))
         return Plugin_Continue;
@@ -6018,7 +6018,7 @@ public Action:ResetQueuePointsCmd(client, args)
 }
 public Action:TurnToZeroPanel(client)
 {
-    if (!Enabled2)
+    if (!g_bAreEnoughPlayersPlaying)
         return Plugin_Continue;
     new Handle:panel = CreatePanel();
     decl String:s[512];
@@ -6113,7 +6113,7 @@ public HalePanelH(Handle:menu, MenuAction:action, param1, param2)
 
 public Action:HalePanel(client, args)
 {
-    if (!Enabled2 || !IsValidClient(client, false))
+    if (!g_bAreEnoughPlayersPlaying || !IsValidClient(client, false))
         return Plugin_Continue;
     new Handle:panel = CreatePanel();
     new size = 256;
@@ -6182,7 +6182,7 @@ public Action:NewPanelCmd(client, args)
 }
 public Action:NewPanel(client, versionindex)
 {
-    if (!Enabled2)
+    if (!g_bAreEnoughPlayersPlaying)
         return Plugin_Continue;
     curHelp[client] = versionindex;
     new Handle:panel = CreatePanel();
@@ -6243,6 +6243,7 @@ FindVersionData(Handle:panel, versionindex)
         {
             DrawPanelText(panel, "1) Added the new festive/other weapons!");
             DrawPanelText(panel, "2) Check out v1.51 because we skipped a version!");
+            DrawPanelText(panel, "3) Maps without health/ammo now randomly spawn some in spawn");
         }
         case 68: //1.51
         {
@@ -6928,7 +6929,7 @@ public Action:HelpPanelCmd(client, args)
 }
 public Action:HelpPanel(client)
 {
-    if (!Enabled2 || IsVoteInProgress())
+    if (!g_bAreEnoughPlayersPlaying || IsVoteInProgress())
         return Plugin_Continue;
     new Handle:panel = CreatePanel();
     decl String:s[512];
@@ -6961,7 +6962,7 @@ public Action:HelpPanel2Cmd(client, args)
 }
 public Action:HelpPanel2(client)
 {
-    if (!Enabled2 || IsVoteInProgress())
+    if (!g_bAreEnoughPlayersPlaying || IsVoteInProgress())
         return Plugin_Continue;
     decl String:s[512];
     new TFClassType:class = TF2_GetPlayerClass(client);
@@ -7006,7 +7007,7 @@ public Action:ClasshelpinfoCmd(client, args)
 }
 public Action:ClasshelpinfoSetting(client)
 {
-    if (!Enabled2)
+    if (!g_bAreEnoughPlayersPlaying)
         return Plugin_Continue;
     new Handle:panel = CreatePanel();
     SetPanelTitle(panel, "Turn the VS Saxton Hale class info...");
@@ -7042,7 +7043,7 @@ public ClasshelpinfoTogglePanelH(Handle:menu, MenuAction:action, param1, param2)
 }
 public Action:HelpPanel1(client, Args)
 {
-    if (!Enabled2)
+    if (!g_bAreEnoughPlayersPlaying)
         return Plugin_Continue;
     new Handle:panel = CreatePanel();
     SetPanelTitle(panel, "Hale is unusually strong.\nBut he doesn't use weapons, because\nhe believes that problems should be\nsolved with bare hands.");
@@ -7060,7 +7061,7 @@ public Action:MusicTogglePanelCmd(client, args)
 }
 public Action:MusicTogglePanel(client)
 {
-    if (!Enabled2 || !IsValidClient(client))
+    if (!g_bAreEnoughPlayersPlaying || !IsValidClient(client))
         return Plugin_Continue;
     new Handle:panel = CreatePanel();
     SetPanelTitle(panel, "Turn the VS Saxton Hale music...");
@@ -7095,7 +7096,7 @@ public Action:VoiceTogglePanelCmd(client, args)
 }
 public Action:VoiceTogglePanel(client)
 {
-    if (!Enabled2 || !IsValidClient(client))
+    if (!g_bAreEnoughPlayersPlaying || !IsValidClient(client))
         return Plugin_Continue;
     new Handle:panel = CreatePanel();
     SetPanelTitle(panel, "Turn the VS Saxton Hale voices...");
@@ -7124,7 +7125,7 @@ public VoiceTogglePanelH(Handle:menu, MenuAction:action, param1, param2)
 
 public Action:HookSound(clients[64], &numClients, String:sample[PLATFORM_MAX_PATH], &entity, &channel, &Float:volume, &level, &pitch, &flags)
 {
-    if (!Enabled || ((entity != Hale) && ((entity <= 0) || !IsValidClient(Hale) || (entity != GetPlayerWeaponSlot(Hale, 0)))))
+    if (!g_bEnabled || ((entity != Hale) && ((entity <= 0) || !IsValidClient(Hale) || (entity != GetPlayerWeaponSlot(Hale, 0)))))
         return Plugin_Continue;
     if (StrContains(sample, "saxton_hale", false) != -1)
         return Plugin_Continue;
@@ -7170,7 +7171,7 @@ public Action:HookSound(clients[64], &numClients, String:sample[PLATFORM_MAX_PAT
 
 public OnEntityCreated(entity, const String:classname[])
 {
-    if (Enabled && VSHRoundState == VSHRState_Active && strcmp(classname, "tf_projectile_pipe", false) == 0)
+    if (g_bEnabled && VSHRoundState == VSHRState_Active && strcmp(classname, "tf_projectile_pipe", false) == 0)
         SDKHook(entity, SDKHook_SpawnPost, OnEggBombSpawned);
 }
 public OnEggBombSpawned(entity)
@@ -7258,7 +7259,7 @@ public Native_IsVSHMap(Handle:plugin, numParams)
 /*
 public Native_IsEnabled(Handle:plugin, numParams)
 {
-    new result = Enabled;
+    new result = g_bEnabled;
     new result2 = result;
 
     new Action:act = Plugin_Continue;
@@ -7377,7 +7378,7 @@ public Native_GetDamage(Handle:plugin, numParams)
 
 public Native_IsEnabled(Handle:plugin, numParams)
 {
-    return Enabled;
+    return g_bEnabled;
 }
 public Native_GetHale(Handle:plugin, numParams)
 {
