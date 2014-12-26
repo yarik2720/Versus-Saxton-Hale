@@ -49,6 +49,24 @@
 #define CBS_MAX_ARROWS 9
 
 #define EASTER_BUNNY_ON
+
+enum                                       //  For IsDate()
+{
+    Month_None = 0,
+    Month_Jan,
+    Month_Feb,
+    Month_Mar,
+    Month_Apr,
+    Month_May,
+    Month_Jun,
+    Month_Jul,
+    Month_Aug,
+    Month_Sep,
+    Month_Oct,
+    Month_Nov,
+    Month_Dec
+}
+
 #define BunnyModel "models/player/saxton_hale/easter_demo.mdl"
 #define BunnyModelPrefix "models/player/saxton_hale/easter_demo"
 #define EggModel "models/player/saxton_hale/w_easteregg.mdl"
@@ -445,7 +463,7 @@ static const String:haleversiondates[][] =
     "18 Aug 2014",
     "04 Oct 2014",
     "29 Oct 2014", //  An update I never bothered to throw outdate
-    "25 Oct 2014"  //  Merry Xmas
+    "25 Dec 2014"  //  Merry Xmas
 };
 static const maxversion = (sizeof(haleversiontitles) - 1);
 new Handle:OnHaleJump;
@@ -808,7 +826,7 @@ public OnMapStart()
     if (IsSaxtonHaleMap(true))
     {
         AddToDownload();
-        IsDecemberHoliday(true);
+        IsDate(.bForceRecalc = true);
         MapHasMusic(true);
         CheckToChangeMapDoors();
         CheckToTeleportToSpawn();
@@ -841,7 +859,7 @@ public OnPluginEnd()
 {
     OnMapEnd();
 }
-public AddToDownload()
+AddToDownload()
 {
     decl String:s[PLATFORM_MAX_PATH];
     new String:extensions[][] = { ".mdl", ".dx80.vtx", ".dx90.vtx", ".sw.vtx", ".vvd", ".phy" };
@@ -1247,7 +1265,7 @@ public Action:Timer_Announce(Handle:hTimer)
     }
     return Plugin_Continue;
 }*/
-stock bool:IsSaxtonHaleMap(bool:forceRecalc = false)
+bool:IsSaxtonHaleMap(bool:forceRecalc = false)
 {
     static bool:found = false;
     static bool:isVSHMap = false;
@@ -1302,7 +1320,7 @@ stock bool:IsSaxtonHaleMap(bool:forceRecalc = false)
     }
     return isVSHMap;
 }
-stock bool:MapHasMusic(bool:forceRecalc = false)
+bool:MapHasMusic(bool:forceRecalc = false)
 {
     static bool:hasMusic;
     static bool:found = false;
@@ -1324,7 +1342,7 @@ stock bool:MapHasMusic(bool:forceRecalc = false)
     }
     return hasMusic;
 }
-stock bool:CheckToChangeMapDoors()
+bool:CheckToChangeMapDoors()
 {
     decl String:s[PLATFORM_MAX_PATH];
     GetCurrentMap(currentmap, sizeof(currentmap));
@@ -1356,7 +1374,7 @@ stock bool:CheckToChangeMapDoors()
     }
     CloseHandle(fileh);
 }
-stock CheckToTeleportToSpawn()
+CheckToTeleportToSpawn()
 {
     decl String:s[PLATFORM_MAX_PATH];
     GetCurrentMap(currentmap, sizeof(currentmap));
@@ -1394,7 +1412,7 @@ stock CheckToTeleportToSpawn()
 
     CloseHandle(fileh);
 }
-stock bool:CheckNextSpecial()
+bool:CheckNextSpecial()
 {
     if (!bSpecials)
     {
@@ -1423,9 +1441,10 @@ stock bool:CheckNextSpecial()
 #endif
                 default: Incoming = VSHSpecial_Hale;
             }
-            if (IsDecemberHoliday() && !GetRandomInt(0, 7)) Incoming = VSHSpecial_CBS;
+//            if (IsDate(Month_Oct, 15) && !GetRandomInt(0, 7)) Incoming = VSHSpecial_HHH; //IsHalloweenHoliday()
+            if (IsDate(Month_Dec, 15) && !GetRandomInt(0, 7)) Incoming = VSHSpecial_CBS; //IsDecemberHoliday()
 #if defined EASTER_BUNNY_ON
-            if (IsEasterHoliday() && !GetRandomInt(0, 7)) Incoming = VSHSpecial_Bunny;
+            if (IsDate(Month_Mar, 25, Month_Apr, 20) && !GetRandomInt(0, 7)) Incoming = VSHSpecial_Bunny; //IsEasterHoliday()
 #endif
         }
     }
@@ -1433,52 +1452,7 @@ stock bool:CheckNextSpecial()
     Incoming = VSHSpecial_None;
     return true;        //OH GOD WHAT AM I DOING THIS ALWAYS RETURNS TRUE (still better than using QueuePanelH as a dummy)
 }
-stock bool:IsEasterHoliday(bool:forceRecalc = false)
-{
-    static iMonth;
-    static iDate;
-    static bool:found = false;
-    if (forceRecalc)
-    {
-        found = false;
-        iMonth = 0;
-        iDate = 0;
-    }
-    if (!found)
-    {
-        new timestamp = GetTime();
-        decl String:month[32], String:date[32];
-        FormatTime(month, sizeof(month), "%m", timestamp);
-        FormatTime(date, sizeof(date), "%d", timestamp);
-        iMonth = StringToInt(month);
-        iDate = StringToInt(date);
-        found = true;
-    }
-    return (iMonth == 3 && iDate >= 25) || (iMonth == 4 && iDate < 20);
-}
-stock bool:IsDecemberHoliday(bool:forceRecalc = false)
-{
-    static iMonth;
-    static iDate;
-    static bool:found = false;
-    if (forceRecalc)
-    {
-        found = false;
-        iMonth = 0;
-        iDate = 0;
-    }
-    if (!found)
-    {
-        new timestamp = GetTime();
-        decl String:month[32], String:date[32];
-        FormatTime(month, sizeof(month), "%m", timestamp);
-        FormatTime(date, sizeof(date), "%d", timestamp);
-        iMonth = StringToInt(month);
-        iDate = StringToInt(date);
-        found = true;
-    }
-    return (iMonth == 12 && iDate >= 15);
-}
+
 public Action:event_round_start(Handle:event, const String:name[], bool:dontBroadcast)
 {
     if (!GetConVarBool(cvarEnabled))
@@ -1594,7 +1568,7 @@ public Action:event_round_start(Handle:event, const String:name[], bool:dontBroa
 
     SetConVarInt(FindConVar("mp_teams_unbalance_limit"), 0);
 
-    if (GetTeamPlayerCount(TFTeam_Blue) <= 0 || GetTeamPlayerCount(TFTeam_Red) <= 0)
+    if (GetTeamClientCount(TFTeam_Blue) <= 0 || GetTeamClientCount(TFTeam_Red) <= 0)
     {
         if (IsValidClient(Hale))
         {
@@ -1691,7 +1665,7 @@ public Action:event_round_start(Handle:event, const String:name[], bool:dontBroa
     return Plugin_Continue;
 }
 
-stock SearchForItemPacks()
+SearchForItemPacks()
 {
     new bool:foundAmmo = false, bool:foundHealth = false;
     new ent = -1;
@@ -1757,12 +1731,52 @@ stock SearchForItemPacks()
     if (!foundHealth) SpawnRandomHealth();
 }
 
-stock SpawnRandomAmmo()
+SpawnRandomAmmo()
 {
+    new iEnt;
+    decl Float:vPos[3];
+    decl Float:vAng[3];
+    DOWHILE_ENTFOUND(iEnt, "info_player_teamspawn")
+    {
+        if (GetRandomInt(0, 4))
+        {
+            continue;
+        }
+
+        // Technically you'll never find a map without a spawn point.
+        GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", vPos);
+        GetEntPropVector(iEnt, Prop_Send, "m_angRotation", vAng);
+
+        new iEnt2 = !GetRandomInt(0, 3) ? CreateEntityByName("item_ammopack_medium") : CreateEntityByName("item_ammopack_small");
+        TeleportEntity(iEnt2, vPos, vAng, NULL_VECTOR);
+        DispatchSpawn(iEnt2);
+        SetEntProp(iEnt2, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
+    }
 }
-stock SpawnRandomHealth()
+
+SpawnRandomHealth()
 {
+    new iEnt;
+    decl Float:vPos[3];
+    decl Float:vAng[3];
+    DOWHILE_ENTFOUND(iEnt, "info_player_teamspawn")
+    {
+        if (GetRandomInt(0, 4))
+        {
+            continue;
+        }
+
+        // Technically you'll never find a map without a spawn point.
+        GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", vPos);
+        GetEntPropVector(iEnt, Prop_Send, "m_angRotation", vAng);
+
+        new iEnt2 = !GetRandomInt(0, 3) ? CreateEntityByName("item_healthkit_medium") : CreateEntityByName("item_healthkit_small");
+        TeleportEntity(iEnt2, vPos, vAng, NULL_VECTOR);
+        DispatchSpawn(iEnt2);
+        SetEntProp(iEnt2, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
+    }
 }
+
 public Action:Timer_EnableCap(Handle:timer)
 {
     if (VSHRoundState == VSHRState_Disabled)
@@ -1781,16 +1795,7 @@ public Action:Timer_EnableCap(Handle:timer)
         }
     }
 }
-stock GetTeamPlayerCount(TFTeam:team)
-{
-    new count = 0;
-    for (new i = 1; i <= MaxClients; i++)
-    {
-        if (IsValidClient(i) && GetClientTeam(i) == _:team)
-            count++;
-    }
-    return count;
-}
+
 public Action:Timer_CheckDoors(Handle:hTimer)
 {
     if (!checkdoors)
@@ -2005,7 +2010,7 @@ public Action:Timer_CalcScores(Handle:timer)
 {
     CalcScores();
 }
-stock CalcScores()
+CalcScores()
 {
     decl j, damage;
     new bool:spec = GetConVarBool(cvarForceSpecToHale);
@@ -2258,7 +2263,7 @@ public Action:Timer_MusicTheme(Handle:timer, any:pack)
     }
     return Plugin_Continue;
 }
-stock EmitSoundToAllExcept(exceptiontype = SOUNDEXCEPT_MUSIC, const String:sample[],
+EmitSoundToAllExcept(exceptiontype = SOUNDEXCEPT_MUSIC, const String:sample[],
                  entity = SOUND_FROM_PLAYER,
                  channel = SNDCHAN_AUTO,
                  level = SNDLEVEL_NORMAL,
@@ -2288,7 +2293,7 @@ stock EmitSoundToAllExcept(exceptiontype = SOUNDEXCEPT_MUSIC, const String:sampl
         level, flags, volume, pitch, speakerentity,
         origin, dir, updatePos, soundtime);
 }
-stock bool:CheckSoundException(client, excepttype)
+bool:CheckSoundException(client, excepttype)
 {
     if (!IsValidClient(client)) return false;
     if (IsFakeClient(client)) return true;
@@ -2378,7 +2383,7 @@ public Action:Timer_SkipHalePanel(Handle:hTimer)
     while (i < 3 && j < TF_MAX_PLAYERS);
 }
 
-stock SkipHalePanelNotify(client, bool:newchoice = true)
+SkipHalePanelNotify(client, bool:newchoice = true)
 {
     if (!Enabled || !IsValidClient(client) || IsVoteInProgress())
     {
@@ -2412,6 +2417,7 @@ stock SkipHalePanelNotify(client, bool:newchoice = true)
     
     return;
 }
+
 public SkipHalePanelH(Handle:menu, MenuAction:action, param1, param2)
 {
     return;
@@ -2836,7 +2842,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
     }
     return Plugin_Continue;
 }
-stock Handle:PrepareItemHandle(Handle:hItem, String:name[] = "", index = -1, const String:att[] = "", bool:dontpreserve = false)
+Handle:PrepareItemHandle(Handle:hItem, String:name[] = "", index = -1, const String:att[] = "", bool:dontpreserve = false)
 {
     static Handle:hWeapon;
     new addattribs = 0;
@@ -3407,7 +3413,7 @@ public Action:Command_Points(client, args)
     ReplyToCommand(client, "[VSH] Added %d queue points to %s", points, target_name);
     return Plugin_Handled;
 }
-stock StopHaleMusic(client)
+StopHaleMusic(client)
 {
     if (!IsValidClient(client)) return;
 //  StopSound(client, SNDCHAN_AUTO, HaleTempTheme);
@@ -3436,7 +3442,8 @@ public Action:Command_Point_Enable(client, args)
     if (Enabled) SetControlPoint(true);
     return Plugin_Handled;
 }
-stock SetControlPoint(bool:enable)
+
+SetControlPoint(bool:enable)
 {
     new CPm=-1; //CP = -1;
     while ((CPm = FindEntityByClassname2(CPm, "team_control_point")) != -1)
@@ -3449,17 +3456,8 @@ stock SetControlPoint(bool:enable)
         }
     }
 }
-stock SetArenaCapEnableTime(Float:time)
-{
-    new ent = -1;
-    decl String:strTime[32];
-    FloatToString(time, strTime, sizeof(strTime));
-    if ((ent = FindEntityByClassname2(-1, "tf_logic_arena")) != -1 && IsValidEdict(ent))
-    {
-        DispatchKeyValue(ent, "CapEnableDelay", strTime);
-    }
-}
-stock ForceHale(admin, client, bool:hidden, bool:forever = false)
+
+ForceHale(admin, client, bool:hidden, bool:forever = false)
 {
     if (forever)
         Hale = client;
@@ -3561,20 +3559,6 @@ public OnClientDisconnect(client)
         }
     }
 }
-
-/*public OnHookedEvent(Handle:hEvent, const String:strEventName[], bool:bHidden)
-{
-    SetRJFlag(GetClientOfUserId(GetEventInt(hEvent, "userid")), StrEqual(strEventName, "rocket_jump", false));
-}
-
-stock GetRJFlag(client)
-    return (0 < client <= MaxClients && IsClientInGame(client) && IsPlayerAlive(client) ? g_bClientRJFlag[client] : false);
-
-stock SetRJFlag(client, bool:bState)
-{
-    if (0 < client <= MaxClients)
-        g_bClientRJFlag[client] = bState;
-}*/
 
 public Action:Timer_SetDisconQueuePoints(Handle:timer, Handle:pack)
 {
@@ -3924,31 +3908,6 @@ public OnPreThinkPost(client)
     }
 }
 
-stock bool:IsNearSpencer(client) 
-{ 
-    new bool:dispenserheal, medics = 0; 
-    new healers = GetEntProp(client, Prop_Send, "m_nNumHealers"); 
-    if (healers > 0) 
-    { 
-        for (new i = 1; i <= MaxClients; i++) 
-        { 
-            if (IsValidClient(i) && IsPlayerAlive(i) && GetHealingTarget(i) == client) 
-                medics++; 
-        } 
-    } 
-    dispenserheal = (healers > medics) ? true : false; 
-    return dispenserheal; 
-} 
-
-stock FindSentry(client)
-{
-    new i=-1;
-    while ((i = FindEntityByClassname2(i, "obj_sentrygun")) != -1)
-    {
-        if (GetEntPropEnt(i, Prop_Send, "m_hBuilder") == client) return i;
-    }
-    return -1;
-}
 public Action:HaleTimer(Handle:hTimer)
 {
     if (VSHRoundState == VSHRState_End)
@@ -4258,7 +4217,7 @@ public Action:Timer_BotRage(Handle:timer)
     if (!IsValidClient(Hale, false)) return;
     if (!TF2_IsPlayerInCondition(Hale, TFCond_Taunting)) FakeClientCommandEx(Hale, "taunt");
 }
-stock OnlyScoutsLeft()
+OnlyScoutsLeft()
 {
     for (new client = 1; client <= MaxClients; client++)
     {
@@ -4280,11 +4239,7 @@ public Action:Destroy(client, const String:command[], argc)
         return Plugin_Handled;
     return Plugin_Continue;
 }
-stock GetIndexOfWeaponSlot(client, slot)
-{
-    new weapon = GetPlayerWeaponSlot(client, slot);
-    return (weapon > MaxClients && IsValidEntity(weapon) ? GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex") : -1);
-}
+
 public TF2_OnConditionRemoved(client, TFCond:condition)
 {
     if (TF2_GetPlayerClass(client) == TFClass_Scout && condition == TFCond_CritHype)
@@ -5643,6 +5598,8 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
  iClient - Client to teleport
  iTeam - Team of spawn points to use. If not specified or invalid team number, teleport to ANY spawn point.
 
+ TODO: Make it not HHH specific
+
 */
 stock TeleportToSpawn(iClient, iTeam = 0)
 {
@@ -5690,17 +5647,8 @@ stock TeleportToSpawn(iClient, iTeam = 0)
     }*/
 }
 
-stock GetClientCloakIndex(client)
-{
-    if (!IsValidClient(client, false)) return -1;
-    new wep = GetPlayerWeaponSlot(client, 4);
-    if (!IsValidEntity(wep)) return -1;
-    new String:classname[64];
-    GetEntityClassname(wep, classname, sizeof(classname));
-    if (strncmp(classname, "tf_wea", 6, false) != 0) return -1;
-    return GetEntProp(wep, Prop_Send, "m_iItemDefinitionIndex");
-}
-stock SpawnSmallHealthPackAt(client, ownerteam = 0)
+
+SpawnSmallHealthPackAt(client, ownerteam = 0)
 {
     if (!IsValidClient(client, false) || !IsPlayerAlive(client)) return;
     new healthpack = CreateEntityByName("item_healthkit_small");
@@ -5741,52 +5689,7 @@ public Action:Timer_CheckBuffRage(Handle:timer, any:userid)
         SetEntPropFloat(client, Prop_Send, "m_flRageMeter", 100.0);
     }
 }
-stock IncrementHeadCount(client)
-{
-    if (!TF2_IsPlayerInCondition(client, TFCond_DemoBuff)) TF2_AddCondition(client, TFCond_DemoBuff, -1.0);
-    new decapitations = GetEntProp(client, Prop_Send, "m_iDecapitations");
-    SetEntProp(client, Prop_Send, "m_iDecapitations", decapitations+1);
-    new health = GetClientHealth(client);
-//  health += (decapitations >= 4 ? 10 : 15);
-    health += 15;
-    SetEntProp(client, Prop_Data, "m_iHealth", health);
-    SetEntProp(client, Prop_Send, "m_iHealth", health);
-    TF2_AddCondition(client, TFCond_SpeedBuffAlly, 0.01);   //recalc their speed
-}
-stock SwitchToOtherWeapon(client)
-{
-    new ammo = GetAmmo(client, 0);
-    new weapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Primary);
-    new clip = (IsValidEntity(weapon) ? GetEntProp(weapon, Prop_Send, "m_iClip1") : -1);
-    if (!(ammo == 0 && clip <= 0)) SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", weapon);
-    else SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary));
-}
-stock FindTeleOwner(client)
-{
-    if (!IsValidClient(client)) return -1;
-    if (!IsPlayerAlive(client)) return -1;
-    new tele = GetEntPropEnt(client, Prop_Send, "m_hGroundEntity");
-    decl String:classname[32];
-    if (IsValidEntity(tele) && GetEdictClassname(tele, classname, sizeof(classname)) && strcmp(classname, "obj_teleporter", false) == 0)
-    {
-        new owner = GetEntPropEnt(tele, Prop_Send, "m_hBuilder");
-        if (IsValidClient(owner, false)) return owner;
-    }
-    return -1;
-}
-stock TF2_IsPlayerCritBuffed(client)
-{
-    return (TF2_IsPlayerInCondition(client, TFCond_Kritzkrieged)
-            || TF2_IsPlayerInCondition(client, TFCond_HalloweenCritCandy)
-            || TF2_IsPlayerInCondition(client, TFCond:34)
-            || TF2_IsPlayerInCondition(client, TFCond:35)
-            || TF2_IsPlayerInCondition(client, TFCond_CritOnFirstBlood)
-            || TF2_IsPlayerInCondition(client, TFCond_CritOnWin)
-            || TF2_IsPlayerInCondition(client, TFCond_CritOnFlagCapture)
-            || TF2_IsPlayerInCondition(client, TFCond_CritOnKill)
-            || TF2_IsPlayerInCondition(client, TFCond_CritMmmph)
-            );
-}
+
 /*public Action:Timer_DisguiseBackstab(Handle:timer, any:userid)
 {
     new client = GetClientOfUserId(userid);
@@ -5875,14 +5778,6 @@ public Timer_NoAttacking(any:ref)
     new weapon = EntRefToEntIndex(ref);
     SetNextAttack(weapon, 1.56);
 }
-stock SetNextAttack(weapon, Float:duration = 0.0)
-{
-    if (weapon <= MaxClients) return;
-    if (!IsValidEntity(weapon)) return;
-    new Float:next = GetGameTime() + duration;
-    SetEntPropFloat(weapon, Prop_Send, "m_flNextPrimaryAttack", next);
-    SetEntPropFloat(weapon, Prop_Send, "m_flNextSecondaryAttack", next);
-}
 public SickleClimbWalls(client, weapon)     //Credit to Mecha the Slag
 {
     if (!IsValidClient(client) || (GetClientHealth(client)<=15) )return;
@@ -5932,7 +5827,7 @@ public bool:TraceRayDontHitSelf(entity, mask, any:data)
 {
     return (entity != data);
 }
-stock FindNextHale(bool:array[])
+FindNextHale(bool:array[])
 {
     new tBoss = -1;
     new tBossPoints = -1073741824;
@@ -5951,13 +5846,13 @@ stock FindNextHale(bool:array[])
     }
     return tBoss;
 }
-stock FindNextHaleEx()
+FindNextHaleEx()
 {
     new bool:added[TF_MAX_PLAYERS];
     if (Hale >= 0) added[Hale] = true;
     return FindNextHale(added);
 }
-stock ForceTeamWin(team)
+ForceTeamWin(team)
 {
     new ent = FindEntityByClassname2(-1, "team_control_point_master");
     if (ent == -1)
@@ -5992,35 +5887,6 @@ stock AttachParticle(ent, String:particleType[], Float:offset = 0.0, bool:battac
     ActivateEntity(particle);
     AcceptEntityInput(particle, "start");
     return particle;
-}
-stock SpawnWeapon(client, String:name[], index, level, qual, String:att[])
-{
-    new Handle:hWeapon = TF2Items_CreateItem(OVERRIDE_ALL|FORCE_GENERATION);
-    if (hWeapon == INVALID_HANDLE)
-        return -1;
-    TF2Items_SetClassname(hWeapon, name);
-    TF2Items_SetItemIndex(hWeapon, index);
-    TF2Items_SetLevel(hWeapon, level);
-    TF2Items_SetQuality(hWeapon, qual);
-    new String:atts[32][32];
-    new count = ExplodeString(att, " ; ", atts, 32, 32);
-    if (count > 1)
-    {
-        TF2Items_SetNumAttributes(hWeapon, count/2);
-        new i2 = 0;
-        for (new i = 0; i < count; i += 2)
-        {
-            TF2Items_SetAttribute(hWeapon, i2, StringToInt(atts[i]), StringToFloat(atts[i+1]));
-            i2++;
-        }
-    }
-    else
-        TF2Items_SetNumAttributes(hWeapon, 0);
-
-    new entity = TF2Items_GiveNamedItem(client, hWeapon);
-    CloseHandle(hWeapon);
-    EquipPlayerWeapon(client, entity);
-    return entity;
 }
 public HintPanelH(Handle:menu, MenuAction:action, param1, param2)
 {
@@ -6369,7 +6235,7 @@ public Action:NewPanel(client, versionindex)
     CloseHandle(panel);
     return Plugin_Continue;
 }
-stock FindVersionData(Handle:panel, versionindex)
+FindVersionData(Handle:panel, versionindex)
 {
     switch (versionindex) // DrawPanelText(panel, "1) .");
     {
@@ -7239,6 +7105,7 @@ public Action:VoiceTogglePanel(client)
     CloseHandle(panel);
     return Plugin_Continue;
 }
+
 public VoiceTogglePanelH(Handle:menu, MenuAction:action, param1, param2)
 {
     if (IsValidClient(param1))
@@ -7254,6 +7121,7 @@ public VoiceTogglePanelH(Handle:menu, MenuAction:action, param1, param2)
         }
     }
 }
+
 public Action:HookSound(clients[64], &numClients, String:sample[PLATFORM_MAX_PATH], &entity, &channel, &Float:volume, &level, &pitch, &flags)
 {
     if (!Enabled || ((entity != Hale) && ((entity <= 0) || !IsValidClient(Hale) || (entity != GetPlayerWeaponSlot(Hale, 0)))))
@@ -7300,63 +7168,6 @@ public Action:HookSound(clients[64], &numClients, String:sample[PLATFORM_MAX_PAT
     return Plugin_Continue;
 }
 
-stock SetAmmo(client, wepslot, newAmmo)
-{
-    new weapon = GetPlayerWeaponSlot(client, wepslot);
-    if (!IsValidEntity(weapon)) return;
-    new type = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType");
-    if (type < 0 || type > 31) return;
-    SetEntProp(client, Prop_Send, "m_iAmmo", newAmmo, _, type);
-}
-
-stock GetAmmo(client, wepslot)
-{
-    if (!IsValidClient(client)) return 0;
-    new weapon = GetPlayerWeaponSlot(client, wepslot);
-    if (!IsValidEntity(weapon)) return 0;
-    new type = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType");
-    if (type < 0 || type > 31) return 0;
-    return GetEntProp(client, Prop_Send, "m_iAmmo", _, type);
-}
-
-stock TF2_GetMetal(client)
-{
-    if (!IsValidClient(client) || !IsPlayerAlive(client)) return 0;
-    return GetEntProp(client, Prop_Send, "m_iAmmo", _, 3);
-}
-
-stock TF2_SetMetal(client, metal)
-{
-    if (!IsValidClient(client) || !IsPlayerAlive(client)) return;
-    SetEntProp(client, Prop_Send, "m_iAmmo", metal, _, 3);
-}
-
-stock GetHealingTarget(client)
-{
-    new String:s[64];
-    new medigun = GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary);
-    if (medigun <= MaxClients || !IsValidEdict(medigun))
-        return -1;
-    GetEdictClassname(medigun, s, sizeof(s));
-    if (strcmp(s, "tf_weapon_medigun", false) == 0)
-    {
-        if (GetEntProp(medigun, Prop_Send, "m_bHealing"))
-            return GetEntPropEnt(medigun, Prop_Send, "m_hHealingTarget");
-    }
-    return -1;
-}
-
-stock bool:IsValidClient(client, bool:replaycheck = true)
-{
-    if (client <= 0 || client > MaxClients) return false;
-    if (!IsClientInGame(client)) return false;
-    if (GetEntProp(client, Prop_Send, "m_bIsCoaching")) return false;
-    if (replaycheck)
-    {
-        if (IsClientSourceTV(client) || IsClientReplay(client)) return false;
-    }
-    return true;
-}
 public OnEntityCreated(entity, const String:classname[])
 {
     if (Enabled && VSHRoundState == VSHRState_Active && strcmp(classname, "tf_projectile_pipe", false) == 0)
@@ -7399,6 +7210,7 @@ public Timer_SetEggBomb(any:ref)
 {
     SDKCall(hEquipWearable, client, entity);
 }*/
+
 stock AttachProjectileModel(entity, String:strModel[], String:strAnim[] = "")
 {
     if (!IsValidEntity(entity)) return -1;
@@ -7429,28 +7241,6 @@ stock AttachProjectileModel(entity, String:strModel[], String:strAnim[] = "")
     return -1;
 }
 
-stock FindEntityByClassname2(startEnt, const String:classname[])
-{
-    /* If startEnt isn't valid shifting it back to the nearest valid one */
-    while (startEnt > -1 && !IsValidEntity(startEnt)) startEnt--;
-    return FindEntityByClassname(startEnt, classname);
-}
-
-// stock SetHaleHealthFix(client, oldhealth)
-// {
-//     new originalhealth = oldhealth; // Wow is this redundant or what... actually this whole function was. Bye.
-// //  if (originalhealth < 4096)
-// //  {
-// //      SetEntProp(client, Prop_Send, "m_iHealth", originalhealth);
-// //      return;
-// //  }
-// //  oldhealth = oldhealth % 4096;
-// //  if (oldhealth < 5) originalhealth += 10;
-// 
-// //  SetEntProp(Hale, Prop_Data, "m_iHealth", HaleHealth);
-//     SetEntProp(client, Prop_Send, "m_iHealth", oldhealth);
-// }
-// 
 public Native_IsVSHMap(Handle:plugin, numParams)
 {
     return IsSaxtonHaleMap();
@@ -7782,7 +7572,7 @@ stock FindPlayerBack(client, indices[], len = sizeof(indices))
     Intended use: Give priority to CenterText messages that fire only once.
                   Don't give priority to repeatedly displaying CenterText (such as when Hale's health is displayed to the last player)
 
-    Main use: Give priority to the more 'special' events (HHH teleport, market gardens, and backstabs)
+    Main use: Give priority to the more 'special' events (HHH teleport, market gardens, telefrags, and backstabs)
 */
 static bool:g_bOverwrite[TF_MAX_PLAYERS] = {false,...}; // TODO: Set false on client connect
 stock PriorityCenterText(iClient, bool:bPriority = false, const String:format[], any:...)
@@ -7853,4 +7643,305 @@ public Action:EndPriorityCenterText(Handle:hTimer, any:Data)
     }
 
     return Plugin_Continue;
+}
+
+/*
+    Returns true if the current date is within bounds.
+
+    Omit StartDay = Check if month matches
+
+    If end values are ommited, it'll go from the start date to the end of the month.
+
+    OnMapStart,
+    IsDate(.bForceRecalc = true);
+    to recalculate the date
+
+    IsDate(Month_Mar, 25, Month_Apr, 20) == IsEasterHoliday()
+    IsDate(Month_Oct, 15) == IsHalloweenHoliday()
+    IsDate(Month_Dec, 15) == IsDecemberHoliday()
+
+*/
+stock bool:IsDate(StartMonth = Month_None, StartDay = 0, EndMonth = Month_None, EndDay = 0, bool:bForceRecalc = false)
+{
+    static iMonth;
+    static iDate;
+    static bool:bFound = false;
+
+    if (bForceRecalc)
+    {
+        bFound = false;
+        iMonth = 0;
+        iDate = 0;
+    }
+
+    if (!bFound)
+    {
+        new iTimeStamp = GetTime();
+        decl String:szMonth[32], String:szDate[32];
+
+        FormatTime(szMonth, sizeof(szMonth), "%m", iTimeStamp);
+        FormatTime(szDate, sizeof(szDate),   "%d", iTimeStamp);
+
+        iMonth = StringToInt(szMonth);
+        iDate = StringToInt(szDate);
+        bFound = true;
+    }
+
+    return (StartMonth == iMonth && StartDay <= iDate) || (EndMonth && EndDay && (StartMonth < iMonth && iMonth <= EndMonth) && (iDate <= EndDay));
+}
+
+stock SetArenaCapEnableTime(Float:time)
+{
+    new ent = -1;
+    decl String:strTime[32];
+    FloatToString(time, strTime, sizeof(strTime));
+    if ((ent = FindEntityByClassname2(-1, "tf_logic_arena")) != -1 && IsValidEdict(ent))
+    {
+        DispatchKeyValue(ent, "CapEnableDelay", strTime);
+    }
+}
+
+stock bool:IsNearSpencer(client) 
+{ 
+    new bool:dispenserheal, medics = 0; 
+    new healers = GetEntProp(client, Prop_Send, "m_nNumHealers"); 
+    if (healers > 0) 
+    { 
+        for (new i = 1; i <= MaxClients; i++) 
+        { 
+            if (IsValidClient(i) && IsPlayerAlive(i) && GetHealingTarget(i) == client) 
+                medics++; 
+        } 
+    } 
+    dispenserheal = (healers > medics) ? true : false; 
+    return dispenserheal; 
+} 
+
+stock FindSentry(client)
+{
+    new i=-1;
+    while ((i = FindEntityByClassname2(i, "obj_sentrygun")) != -1)
+    {
+        if (GetEntPropEnt(i, Prop_Send, "m_hBuilder") == client) return i;
+    }
+    return -1;
+}
+
+stock GetIndexOfWeaponSlot(client, slot)
+{
+    new weapon = GetPlayerWeaponSlot(client, slot);
+    return (weapon > MaxClients && IsValidEntity(weapon) ? GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex") : -1);
+}
+
+stock GetClientCloakIndex(client)
+{
+    if (!IsValidClient(client, false)) return -1;
+    new wep = GetPlayerWeaponSlot(client, 4);
+    if (!IsValidEntity(wep)) return -1;
+    new String:classname[64];
+    GetEntityClassname(wep, classname, sizeof(classname));
+    if (strncmp(classname, "tf_wea", 6, false) != 0) return -1;
+    return GetEntProp(wep, Prop_Send, "m_iItemDefinitionIndex");
+}
+
+stock IncrementHeadCount(client)
+{
+    if (!TF2_IsPlayerInCondition(client, TFCond_DemoBuff)) TF2_AddCondition(client, TFCond_DemoBuff, -1.0);
+    new decapitations = GetEntProp(client, Prop_Send, "m_iDecapitations");
+    SetEntProp(client, Prop_Send, "m_iDecapitations", decapitations+1);
+    new health = GetClientHealth(client);
+//  health += (decapitations >= 4 ? 10 : 15);
+    health += 15;
+    SetEntProp(client, Prop_Data, "m_iHealth", health);
+    SetEntProp(client, Prop_Send, "m_iHealth", health);
+    TF2_AddCondition(client, TFCond_SpeedBuffAlly, 0.01);   //recalc their speed
+}
+
+stock SwitchToOtherWeapon(client)
+{
+    new ammo = GetAmmo(client, 0);
+    new weapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Primary);
+    new clip = (IsValidEntity(weapon) ? GetEntProp(weapon, Prop_Send, "m_iClip1") : -1);
+    if (!(ammo == 0 && clip <= 0)) SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", weapon);
+    else SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary));
+}
+
+stock FindTeleOwner(client)
+{
+    if (!IsValidClient(client)) return -1;
+    if (!IsPlayerAlive(client)) return -1;
+    new tele = GetEntPropEnt(client, Prop_Send, "m_hGroundEntity");
+    decl String:classname[32];
+    if (IsValidEntity(tele) && GetEdictClassname(tele, classname, sizeof(classname)) && strcmp(classname, "obj_teleporter", false) == 0)
+    {
+        new owner = GetEntPropEnt(tele, Prop_Send, "m_hBuilder");
+        if (IsValidClient(owner, false)) return owner;
+    }
+    return -1;
+}
+
+stock TF2_IsPlayerCritBuffed(client)
+{
+    return (TF2_IsPlayerInCondition(client, TFCond_Kritzkrieged)
+            || TF2_IsPlayerInCondition(client, TFCond_HalloweenCritCandy)
+            || TF2_IsPlayerInCondition(client, TFCond:34)
+            || TF2_IsPlayerInCondition(client, TFCond:35)
+            || TF2_IsPlayerInCondition(client, TFCond_CritOnFirstBlood)
+            || TF2_IsPlayerInCondition(client, TFCond_CritOnWin)
+            || TF2_IsPlayerInCondition(client, TFCond_CritOnFlagCapture)
+            || TF2_IsPlayerInCondition(client, TFCond_CritOnKill)
+            || TF2_IsPlayerInCondition(client, TFCond_CritMmmph)
+            );
+}
+
+stock SetNextAttack(weapon, Float:duration = 0.0)
+{
+    if (weapon <= MaxClients) return;
+    if (!IsValidEntity(weapon)) return;
+    new Float:next = GetGameTime() + duration;
+    SetEntPropFloat(weapon, Prop_Send, "m_flNextPrimaryAttack", next);
+    SetEntPropFloat(weapon, Prop_Send, "m_flNextSecondaryAttack", next);
+}
+
+#if defined _tf2items_included
+stock SpawnWeapon(client, String:name[], index, level, qual, String:att[])
+{
+    new Handle:hWeapon = TF2Items_CreateItem(OVERRIDE_ALL|FORCE_GENERATION);
+    if (hWeapon == INVALID_HANDLE)
+        return -1;
+    TF2Items_SetClassname(hWeapon, name);
+    TF2Items_SetItemIndex(hWeapon, index);
+    TF2Items_SetLevel(hWeapon, level);
+    TF2Items_SetQuality(hWeapon, qual);
+    new String:atts[32][32];
+    new count = ExplodeString(att, " ; ", atts, 32, 32);
+    if (count > 1)
+    {
+        TF2Items_SetNumAttributes(hWeapon, count/2);
+        new i2 = 0;
+        for (new i = 0; i < count; i += 2)
+        {
+            TF2Items_SetAttribute(hWeapon, i2, StringToInt(atts[i]), StringToFloat(atts[i+1]));
+            i2++;
+        }
+    }
+    else
+        TF2Items_SetNumAttributes(hWeapon, 0);
+
+    new entity = TF2Items_GiveNamedItem(client, hWeapon);
+    CloseHandle(hWeapon);
+    EquipPlayerWeapon(client, entity);
+    return entity;
+}
+#endif
+
+
+stock SetAmmo(client, wepslot, newAmmo)
+{
+    new weapon = GetPlayerWeaponSlot(client, wepslot);
+    if (!IsValidEntity(weapon)) return;
+    new type = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType");
+    if (type < 0 || type > 31) return;
+    SetEntProp(client, Prop_Send, "m_iAmmo", newAmmo, _, type);
+}
+
+stock GetAmmo(client, wepslot)
+{
+    if (!IsValidClient(client)) return 0;
+    new weapon = GetPlayerWeaponSlot(client, wepslot);
+    if (!IsValidEntity(weapon)) return 0;
+    new type = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType");
+    if (type < 0 || type > 31) return 0;
+    return GetEntProp(client, Prop_Send, "m_iAmmo", _, type);
+}
+
+stock TF2_GetMetal(client)
+{
+    if (!IsValidClient(client) || !IsPlayerAlive(client)) return 0;
+    return GetEntProp(client, Prop_Send, "m_iAmmo", _, 3);
+}
+
+stock TF2_SetMetal(client, metal)
+{
+    if (!IsValidClient(client) || !IsPlayerAlive(client)) return;
+    SetEntProp(client, Prop_Send, "m_iAmmo", metal, _, 3);
+}
+
+stock GetHealingTarget(client)
+{
+    new String:s[64];
+    new medigun = GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary);
+    if (medigun <= MaxClients || !IsValidEdict(medigun))
+        return -1;
+    GetEdictClassname(medigun, s, sizeof(s));
+    if (strcmp(s, "tf_weapon_medigun", false) == 0)
+    {
+        if (GetEntProp(medigun, Prop_Send, "m_bHealing"))
+            return GetEntPropEnt(medigun, Prop_Send, "m_hHealingTarget");
+    }
+    return -1;
+}
+
+stock bool:IsValidClient(client, bool:replaycheck = true)
+{
+    if (client <= 0 || client > MaxClients) return false;
+    if (!IsClientInGame(client)) return false;
+    if (GetEntProp(client, Prop_Send, "m_bIsCoaching")) return false;
+    if (replaycheck)
+    {
+        if (IsClientSourceTV(client) || IsClientReplay(client)) return false;
+    }
+    return true;
+}
+
+stock FindEntityByClassname2(startEnt, const String:classname[])
+{
+    /* If startEnt isn't valid shifting it back to the nearest valid one */
+    while (startEnt > -1 && !IsValidEntity(startEnt)) startEnt--;
+    return FindEntityByClassname(startEnt, classname);
+}
+
+#endinput
+
+// TODO: Implement this stuff
+
+/*
+    Common check that says whether or not a client index is occupied.
+*/
+stock bool:IsValidClient(iClient)
+{
+    return (0 < iClient && iClient <= MaxClients && IsClientInGame(iClient));
+}
+
+/*
+    Common checks that says "this player can safely be selected from a queue of players"
+*/
+stock bool:IsClientParticipating(iClient)
+{
+    if (IsSpectator(iClient) || IsReplayClient(iClient))
+    {
+        return false;
+    }
+    
+    if (bool:GetEntProp(iClient, Prop_Send, "m_bIsCoaching")) 
+    {
+        return false;
+    }
+    
+    if (TF2_GetPlayerClass(iClient) == TFClass_Unknown)
+    {
+        return false;
+    }
+    
+    return true;
+}
+
+stock bool:IsSpectator(iClient)
+{
+    return GetClientTeam(iClient) <= TEAM_SPEC;
+}
+
+stock bool:IsReplayClient(iClient)
+{
+    return IsClientReplay(iClient) || IsClientSourceTV(iClient);
 }
