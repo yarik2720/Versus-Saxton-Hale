@@ -11,7 +11,7 @@ The precursor to [FF2](https://github.com/50DKP/FF2-Official).
 Copy the `addons` folder to the server's `tf/` folder.
 The `scripting` folder within is entirely unnecessary unless you are a modder or want to disable the easter boss.
 
-###For people updating to 1.49
+###For people updating to 1.52
 Look through the folders inside the `addons/sourcemod/` folder.
 
 The folders that need to be updated are:

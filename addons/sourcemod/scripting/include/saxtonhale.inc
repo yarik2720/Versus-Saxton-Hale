@@ -3,6 +3,27 @@
 #endif
 #define _VSH_included
 
+
+// VSH_GetRoundState()
+enum
+{
+    VSHRState_Disabled = -1,
+    VSHRState_Waiting,
+    VSHRState_Active,
+    VSHRState_End
+}
+
+// VSH_GetSpecialRoundIndex()
+enum
+{
+    VSHSpecial_None = -1,
+    VSHSpecial_Hale,
+    VSHSpecial_Vagineer,
+    VSHSpecial_HHH,
+    VSHSpecial_CBS,
+    VSHSpecial_Bunny
+}
+
 /**
  * Will VSH be played on the current map?
  * Use this check in OnMapStart() or OnPluginStart(),
