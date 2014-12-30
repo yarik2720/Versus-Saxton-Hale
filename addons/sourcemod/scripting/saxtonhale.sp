@@ -2796,7 +2796,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 43, 239, 1100, 1084: // GRU
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, 239, "107 ; 1.5 ; 1 ; 0.5 ; 128 ; 1 ; 191 ; -7", true);
+            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "107 ; 1.5 ; 1 ; 0.5 ; 128 ; 1 ; 191 ; -7", true);
             if (hItemOverride != INVALID_HANDLE)
             {
                 hItem = hItemOverride;
@@ -3562,7 +3562,7 @@ public Action:event_player_spawn(Handle:event, const String:name[], bool:dontBro
         {
             VSHFlags[client] |= VSHFLAG_HASONGIVED;
             RemovePlayerBack(client, { 57, 133, 231, 405, 444, 608, 642 });
-            RemovePlayerTarge(client);
+            RemoveDemoShield(client);
             TF2_RemoveAllWeapons(client);
             TF2_RegeneratePlayer(client);
             CreateTimer(0.1, Timer_RegenPlayer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
@@ -4303,7 +4303,7 @@ public Action:DoTaunt(client, const String:command[], argc)
                 strcopy(s, PLATFORM_MAX_PATH, BunnyRage[GetRandomInt(1, sizeof(BunnyRage)-1)]);
                 EmitSoundToAll(s, _, _, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, _, pos, NULL_VECTOR, false, 0.0);
                 TF2_RemoveWeaponSlot(client, TFWeaponSlot_Primary);
-                new weapon = SpawnWeapon(client, "tf_weapon_grenadelauncher", 19, 100, 5, "1 ; 0.6 ; 6 ; 0.1 ; 411 ; 150.0 ; 413 ; 1.0 ; 37 ; 0.0 ; 280 ; 17 ; 477 ; 1.0 ; 467 ; 1.0 ; 181 ; 2.0 ; 252 ; 0.7");
+                new weapon = SpawnWeapon(client, "tf_weapon_grenadelauncher", 19, 100, 5, "6 ; 0.1 ; 411 ; 150.0 ; 413 ; 1.0 ; 37 ; 0.0 ; 280 ; 17 ; 477 ; 1.0 ; 467 ; 1.0 ; 181 ; 2.0 ; 252 ; 0.7");
                 SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", weapon);
                 SetEntProp(weapon, Prop_Send, "m_iClip1", 50);
 //              new vm = CreateVM(client, ReloadEggModel);
@@ -5037,7 +5037,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
             return Plugin_Changed;
         }
 
-        if (RemovePlayerTarge(client)) // If the demo had a shield to break
+        if (RemoveDemoShield(client)) // If the demo had a shield to break
         {
             EmitSoundToClient(client, "player/spy_shield_break.wav", _, _, _, _, 0.7, 100, _, vPos, _, false);
             EmitSoundToClient(attacker, "player/spy_shield_break.wav", _, _, _, _, 0.7, 100, _, vPos, _, false);
@@ -6191,6 +6191,7 @@ FindVersionData(Handle:panel, versionindex)
 {
     switch (versionindex) // DrawPanelText(panel, "1) .");
     {
+        // Unnerfed the Easter Bunny's rage.
         case 69: //1.52
         {
             DrawPanelText(panel, "1) Added the new festive/other weapons!");
@@ -7398,7 +7399,7 @@ stock bool:RemoveCond(iClient, TFCond:iCond)
 }
 
 // true if removed, false if not found / etc
-stock bool:RemovePlayerTarge(iClient)
+stock bool:RemoveDemoShield(iClient)
 {
     new iEnt = MaxClients + 1;
     while ((iEnt = FindEntityByClassname2(iEnt, "tf_wearable_demoshield")) != -1)
@@ -7714,7 +7715,7 @@ stock IncrementHeadCount(iClient)
     InsertCond(iClient, TFCond_DemoBuff);
     SetEntProp(iClient, Prop_Send, "m_iDecapitations", GetEntProp(iClient, Prop_Send, "m_iDecapitations") + 1);
     AddPlayerHealth(iClient, 15, 900000, true);             //  The old version of this allowed infinite health gain... so ;v
-    TF2_AddCondition(iClient, TFCond_SpeedBuffAlly, 0.01);  //  Recalcalculate their speed
+    TF2_AddCondition(iClient, TFCond_SpeedBuffAlly, 0.01);  //  Recalculate their speed
 }
 
 stock SwitchToOtherWeapon(client)
