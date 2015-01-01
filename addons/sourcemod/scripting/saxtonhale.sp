@@ -1184,6 +1184,10 @@ AddToDownload()
     {
         PrecacheSound(BunnyStart[i], true);
     }
+    for (i = 0; i < sizeof(BunnyRandomVoice); i++)
+    {
+        PrecacheSound(BunnyRandomVoice[i], true);
+    }
 
 #endif
 }
