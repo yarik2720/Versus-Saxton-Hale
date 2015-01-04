@@ -1,29 +1,30 @@
 env:
     - SMVERSION=1.6
     - SMVERSION=1.7
+    - SMVERSION=1.8
 matrix:
   fast_finish: true
   allow_failures:
     - env: SMVERSION=1.7
+    - env: SMVERSION=1.8
 before_install:
     - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test > /dev/null
     - sudo apt-get update -qq > /dev/null
-    - sudo apt-get -qq update && sudo apt-get install gcc-multilib lynx lib32stdc++6 -y
+    - sudo apt-get install gcc-multilib lynx lib32stdc++6 mercurial -y  > /dev/null
 install:
     - SMPATTERN="http:.*sourcemod-.*-git.*-linux.*"
     - SMURL="http://www.sourcemod.net/smdrop/$SMVERSION/"
     - SMPACKAGE=`lynx -dump "$SMURL" | egrep -o "$SMPATTERN" | tail -1`
     - wget $SMPACKAGE
     - tar -xzf $(basename "$SMPACKAGE")
-    - ASHERKINURL="https://builds.limetech.org/files/"
-    - TF2ITEMSPATTERN="https:.*tf2items-.*-.*-linux.zip"
-    - TF2ITEMSPACKAGE=`lynx -dump "$ASHERKINURL" | egrep -o "$TF2ITEMSPATTERN" | tail -1`
-    - wget $TF2ITEMSPACKAGE
-    - unzip $(basename "$TF2ITEMSPACKAGE")
-    - STEAMTOOLSPATTERN="https:.*steamtools-.*-git.*-.*-linux.zip"
-    - STEAMTOOLSPACKAGE=`lynx -dump "$ASHERKINURL" | egrep -o "$STEAMTOOLSPATTERN" | tail -1`
-    - wget $STEAMTOOLSPACKAGE
-    - unzip $(basename "$STEAMTOOLSPACKAGE")
+    - mkdir depends
+    - cd depends
+    - git clone https://code.limetech.org/diffusion/ST/steamtools.git steamtools
+    - mv steamtools/plugin/steamtools.inc ../addons/sourcemod/scripting/include/
+    - rm -rf ./*
+    - hg clone http://hg.limetech.org/projects/tf2items/tf2items_source/ tf2items
+    - mv tf2items/pawn/tf2items.inc ../addons/sourcemod/scripting/include/
+    - cd ../ && rm -rf depends
     - cd addons/sourcemod
 before_script:
     - cd ./scripting/
