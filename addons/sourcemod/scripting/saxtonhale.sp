@@ -77,13 +77,157 @@ enum
     Month_Dec
 }
 
-#define BunnyModel "models/player/saxton_hale/easter_demo.mdl"
-#define BunnyModelPrefix "models/player/saxton_hale/easter_demo"
-#define EggModel "models/player/saxton_hale/w_easteregg.mdl"
-#define EggModelPrefix "models/player/saxton_hale/w_easteregg"
-#define ReloadEggModel "models/player/saxton_hale/c_easter_cannonball.mdl"
-#define ReloadEggModelPrefix "models/player/saxton_hale/c_easter_cannonball"
+// START FILE DEFINTIONS
 
+// Saxton Hale Files
+
+// Model
+#define HaleModel               "models/player/saxton_hale/saxton_hale.mdl"
+
+// Materials
+// Prepared Manually
+
+// SFX
+#define HaleYellName            "saxton_hale/saxton_hale_responce_1a.wav"
+#define HaleRageSoundB          "saxton_hale/saxton_hale_responce_1b.wav"
+#define HaleComicArmsFallSound  "saxton_hale/saxton_hale_responce_2.wav"
+#define HaleLastB               "vo/announcer_am_lastmanalive"
+
+#define HaleKSpree              "saxton_hale/saxton_hale_responce_3.wav"
+//HaleKSpree2 - this line is broken and unused
+#define HaleKSpree2             "saxton_hale/saxton_hale_responce_4.wav"
+
+//===New responces===
+#define HaleRoundStart          "saxton_hale/saxton_hale_responce_start"                // 1-5
+#define HaleJump                "saxton_hale/saxton_hale_responce_jump"                 // 1-2
+#define HaleRageSound           "saxton_hale/saxton_hale_responce_rage"                 // 1-4
+#define HaleKillMedic           "saxton_hale/saxton_hale_responce_kill_medic.wav"
+#define HaleKillSniper1         "saxton_hale/saxton_hale_responce_kill_sniper1.wav"
+#define HaleKillSniper2         "saxton_hale/saxton_hale_responce_kill_sniper2.wav"
+#define HaleKillSpy1            "saxton_hale/saxton_hale_responce_kill_spy1.wav"
+#define HaleKillSpy2            "saxton_hale/saxton_hale_responce_kill_spy2.wav"
+#define HaleKillEngie1          "saxton_hale/saxton_hale_responce_kill_eggineer1.wav"
+#define HaleKillEngie2          "saxton_hale/saxton_hale_responce_kill_eggineer2.wav"
+#define HaleKSpreeNew           "saxton_hale/saxton_hale_responce_spree"                // 1-5
+#define HaleWin                 "saxton_hale/saxton_hale_responce_win"                  // 1-2
+#define HaleLastMan             "saxton_hale/saxton_hale_responce_lastman"              // 1-5
+//#define HaleLastMan2Fixed     "saxton_hale/saxton_hale_responce_lastman2.wav"
+#define HaleFail                "saxton_hale/saxton_hale_responce_fail"                 // 1-3
+
+//===1.32 responces===
+#define HaleJump132             "saxton_hale/saxton_hale_132_jump_"                     // 1-2
+#define HaleStart132            "saxton_hale/saxton_hale_132_start_"                    // 1-5
+#define HaleKillDemo132         "saxton_hale/saxton_hale_132_kill_demo.wav"
+#define HaleKillEngie132        "saxton_hale/saxton_hale_132_kill_engie_"               // 1-2
+#define HaleKillHeavy132        "saxton_hale/saxton_hale_132_kill_heavy.wav"
+#define HaleKillScout132        "saxton_hale/saxton_hale_132_kill_scout.wav"
+#define HaleKillSpy132          "saxton_hale/saxton_hale_132_kill_spie.wav"
+#define HaleKillPyro132         "saxton_hale/saxton_hale_132_kill_w_and_m1.wav"
+#define HaleSappinMahSentry132  "saxton_hale/saxton_hale_132_kill_toy.wav"
+#define HaleKillKSpree132       "saxton_hale/saxton_hale_132_kspree_"                   // 1-2
+#define HaleKillLast132         "saxton_hale/saxton_hale_132_last.wav"
+#define HaleStubbed132          "saxton_hale/saxton_hale_132_stub_"                     // 1-4
+
+// Unused
+//#define HaleEnabled             QueuePanelH(Handle:0, MenuAction:0, 9001, 0)
+
+
+// Christian Brutal Sniper Files
+
+// Model
+#define CBSModel                "models/player/saxton_hale/cbs_v4.mdl"
+
+// Materials
+// Prepared Manually
+
+// SFX
+#define CBSTheme                "saxton_hale/the_millionaires_holiday.mp3"
+#define CBS0                    "vo/sniper_specialweapon08.wav"
+#define CBS1                "vo/taunts/sniper_taunts02.wav"
+#define CBS2                    "vo/sniper_award"
+#define CBS3                "vo/sniper_battlecry03.wav"
+#define CBS4                    "vo/sniper_domination"
+#define CBSJump1                "vo/sniper_specialcompleted02.wav"
+
+// Unused
+//#define ShivModel               "models/weapons/c_models/c_wood_machete/c_wood_machete.mdl"
+
+
+// Horseless Headless Horsemann Files
+
+// Model
+#define HHHModel                "models/player/saxton_hale/hhh_jr_mk3.mdl"
+
+// Materials
+
+// SFX
+#define HHHLaught               "vo/halloween_boss/knight_laugh"
+#define HHHRage                 "vo/halloween_boss/knight_attack01.wav"
+#define HHHRage2                "vo/halloween_boss/knight_alert.wav"
+#define HHHAttack               "vo/halloween_boss/knight_attack"
+
+#define HHHTheme                "saxton_hale/hhh_theme.mp3"
+
+// Unused
+//#define AxeModel                "models/weapons/c_models/c_headtaker/c_headtaker.mdl"
+
+
+// Vagineer Files
+
+// Model
+#define VagineerModel           "models/player/saxton_hale/vagineer_v134.mdl"
+
+// Materials
+// None! He uses Engineer's stuff
+
+// SFX
+#define VagineerLastA           "saxton_hale/lolwut_0.wav"
+#define VagineerRageSound       "saxton_hale/lolwut_2.wav"
+#define VagineerStart           "saxton_hale/lolwut_1.wav"
+#define VagineerKSpree          "saxton_hale/lolwut_3.wav"
+#define VagineerKSpree2         "saxton_hale/lolwut_4.wav"
+#define VagineerHit             "saxton_hale/lolwut_5.wav"
+
+//===New Vagineer's responces===
+#define VagineerRoundStart      "saxton_hale/vagineer_responce_intro.wav"
+#define VagineerJump            "saxton_hale/vagineer_responce_jump_"         //  1-2
+#define VagineerRageSound2      "saxton_hale/vagineer_responce_rage_"         //  1-4
+#define VagineerKSpreeNew       "saxton_hale/vagineer_responce_taunt_"        //  1-5
+#define VagineerFail            "saxton_hale/vagineer_responce_fail_"         //  1-2
+
+// Unused
+//#define VagineerModel           "models/player/saxton_hale/vagineer_v150.mdl"
+//#define WrenchModel             "models/weapons/w_models/w_wrench.mdl"
+
+
+#if defined EASTER_BUNNY_ON
+// Easter Bunny Files
+
+// Model
+#define BunnyModel              "models/player/saxton_hale/easter_demo.mdl"
+#define EggModel                "models/player/saxton_hale/w_easteregg.mdl"
+
+// Materials
+static const String:BunnyMaterials[][] = {
+    "materials/models/player/easter_demo/demoman_head_red.vmt",
+    "materials/models/player/easter_demo/easter_body.vmt",
+    "materials/models/player/easter_demo/easter_body.vtf",
+    "materials/models/player/easter_demo/easter_rabbit.vmt",
+    "materials/models/player/easter_demo/easter_rabbit.vtf",
+    "materials/models/player/easter_demo/easter_rabbit_normal.vtf",
+    "materials/models/player/easter_demo/eyeball_r.vmt",
+    "materials/models/player/easter_demo/demoman_head_blue_invun.vmt",
+    "materials/models/player/easter_demo/demoman_head_red_invun.vmt",
+    "materials/models/player/easter_demo/easter_rabbit_blue.vmt",
+    "materials/models/player/easter_demo/easter_rabbit_blue.vtf",
+    "materials/models/player/easter_demo/easter_rabbit_invun.vmt",
+    "materials/models/player/easter_demo/easter_rabbit_invun.vtf",
+    "materials/models/player/easter_demo/easter_rabbit_invun_blue.vmt",
+    "materials/models/player/easter_demo/easter_rabbit_invun_blue.vtf",
+    "materials/models/player/easter_demo/eyeball_invun.vmt"
+};
+
+// SFX
 static const String:BunnyWin[][] = {
     "vo/demoman_gibberish01.wav",
     "vo/demoman_gibberish12.wav",
@@ -94,17 +238,20 @@ static const String:BunnyWin[][] = {
     "vo/demoman_cheers08.wav",
     "vo/taunts/demoman_taunts12.wav"
 };
+
 static const String:BunnyJump[][] = {
     "vo/demoman_gibberish07.wav",
     "vo/demoman_gibberish08.wav",
     "vo/demoman_laughshort01.wav",
     "vo/demoman_positivevocalization04.wav"
 };
+
 static const String:BunnyRage[][] = {
     "vo/demoman_positivevocalization03.wav",
     "vo/demoman_dominationscout05.wav",
     "vo/demoman_cheers02.wav"
 };
+
 static const String:BunnyFail[][] = {
     "vo/demoman_gibberish04.wav",
     "vo/demoman_gibberish10.wav",
@@ -113,12 +260,14 @@ static const String:BunnyFail[][] = {
     "vo/demoman_jeers07.wav",
     "vo/demoman_jeers08.wav"
 };
+
 static const String:BunnyKill[][] = {
     "vo/demoman_gibberish09.wav",
     "vo/demoman_cheers02.wav",
     "vo/demoman_cheers07.wav",
     "vo/demoman_positivevocalization03.wav"
 };
+
 static const String:BunnySpree[][] = {
     "vo/demoman_gibberish05.wav",
     "vo/demoman_gibberish06.wav",
@@ -127,20 +276,24 @@ static const String:BunnySpree[][] = {
     "vo/demoman_gibberish13.wav",
     "vo/demoman_autodejectedtie01.wav"
 };
+
 static const String:BunnyLast[][] = {
     "vo/taunts/demoman_taunts05.wav",
     "vo/taunts/demoman_taunts04.wav",
     "vo/demoman_specialcompleted07.wav"
 };
+
 static const String:BunnyPain[][] = {
     "vo/demoman_sf12_badmagic01.wav",
     "vo/demoman_sf12_badmagic07.wav",
     "vo/demoman_sf12_badmagic10.wav"
 };
+
 static const String:BunnyStart[][] = {
     "vo/demoman_gibberish03.wav",
     "vo/demoman_gibberish11.wav"
 };
+
 static const String:BunnyRandomVoice[][] = {
     "vo/demoman_positivevocalization03.wav",
     "vo/demoman_jeers08.wav",
@@ -155,77 +308,12 @@ static const String:BunnyRandomVoice[][] = {
     "vo/burp07.wav"
 };
 
-#define HaleModel "models/player/saxton_hale/saxton_hale.mdl"
-#define HaleModelPrefix "models/player/saxton_hale/saxton_hale"
-#define CBSModel "models/player/saxton_hale/cbs_v4.mdl"
-#define CBSModelPrefix "models/player/saxton_hale/cbs_v4"
-#define HaleYellName "saxton_hale/saxton_hale_responce_1a.wav"
-#define HaleRageSoundB "saxton_hale/saxton_hale_responce_1b.wav"
-#define HaleComicArmsFallSound "saxton_hale/saxton_hale_responce_2.wav"
-#define HaleLastB "vo/announcer_am_lastmanalive"
-#define HaleEnabled QueuePanelH(Handle:0, MenuAction:0, 9001, 0)
-#define HaleKSpree "saxton_hale/saxton_hale_responce_3.wav"
-#define HaleKSpree2 "saxton_hale/saxton_hale_responce_4.wav"    //this line is broken and unused
-#define VagineerModel "models/player/saxton_hale/vagineer_v134.mdl"
-#define VagineerModelPrefix "models/player/saxton_hale/vagineer_v134"
-#define VagineerLastA "saxton_hale/lolwut_0.wav"
-#define VagineerRageSound "saxton_hale/lolwut_2.wav"
-#define VagineerStart "saxton_hale/lolwut_1.wav"
-#define VagineerKSpree "saxton_hale/lolwut_3.wav"
-#define VagineerKSpree2 "saxton_hale/lolwut_4.wav"
-#define VagineerHit "saxton_hale/lolwut_5.wav"
-#define WrenchModel "models/weapons/w_models/w_wrench.mdl"
-#define ShivModel "models/weapons/c_models/c_wood_machete/c_wood_machete.mdl"
-#define HHHModel "models/player/saxton_hale/hhh_jr_mk3.mdl"
-#define HHHModelPrefix "models/player/saxton_hale/hhh_jr_mk3"
-#define AxeModel "models/weapons/c_models/c_headtaker/c_headtaker.mdl"
-#define HHHLaught "vo/halloween_boss/knight_laugh"
-#define HHHRage "vo/halloween_boss/knight_attack01.wav"
-#define HHHRage2 "vo/halloween_boss/knight_alert.wav"
-#define HHHAttack "vo/halloween_boss/knight_attack"
-#define CBS0 "vo/sniper_specialweapon08.wav"
-#define CBS1 "vo/taunts/sniper_taunts02.wav"
-#define CBS2 "vo/sniper_award"
-#define CBS3 "vo/sniper_battlecry03.wav"
-#define CBS4 "vo/sniper_domination"
-#define HHHTheme "ui/holiday/gamestartup_halloween.mp3"
-#define CBSTheme "saxton_hale/the_millionaires_holiday.mp3"
-#define CBSJump1 "vo/sniper_specialcompleted02.wav"
-//===New responces===
-#define HaleRoundStart "saxton_hale/saxton_hale_responce_start" //1-5
-#define HaleJump "saxton_hale/saxton_hale_responce_jump"            //1-2
-#define HaleRageSound "saxton_hale/saxton_hale_responce_rage"           //1-4
-#define HaleKillMedic "saxton_hale/saxton_hale_responce_kill_medic.wav"
-#define HaleKillSniper1 "saxton_hale/saxton_hale_responce_kill_sniper1.wav"
-#define HaleKillSniper2 "saxton_hale/saxton_hale_responce_kill_sniper2.wav"
-#define HaleKillSpy1 "saxton_hale/saxton_hale_responce_kill_spy1.wav"
-#define HaleKillSpy2 "saxton_hale/saxton_hale_responce_kill_spy2.wav"
-#define HaleKillEngie1 "saxton_hale/saxton_hale_responce_kill_eggineer1.wav"
-#define HaleKillEngie2 "saxton_hale/saxton_hale_responce_kill_eggineer2.wav"
-#define HaleKSpreeNew "saxton_hale/saxton_hale_responce_spree"  //1-5
-#define HaleWin "saxton_hale/saxton_hale_responce_win"          //1-2
-#define HaleLastMan "saxton_hale/saxton_hale_responce_lastman"  //1-5
-//#define HaleLastMan2Fixed "saxton_hale/saxton_hale_responce_lastman2.wav"
-#define HaleFail "saxton_hale/saxton_hale_responce_fail"            //1-3
-//===1.32 responces===
-#define HaleJump132 "saxton_hale/saxton_hale_132_jump_" //1-2
-#define HaleStart132 "saxton_hale/saxton_hale_132_start_"   //1-5
-#define HaleKillDemo132  "saxton_hale/saxton_hale_132_kill_demo.wav"
-#define HaleKillEngie132  "saxton_hale/saxton_hale_132_kill_engie_" //1-2
-#define HaleKillHeavy132  "saxton_hale/saxton_hale_132_kill_heavy.wav"
-#define HaleKillScout132  "saxton_hale/saxton_hale_132_kill_scout.wav"
-#define HaleKillSpy132  "saxton_hale/saxton_hale_132_kill_spie.wav"
-#define HaleKillPyro132  "saxton_hale/saxton_hale_132_kill_w_and_m1.wav"
-#define HaleSappinMahSentry132  "saxton_hale/saxton_hale_132_kill_toy.wav"
-#define HaleKillKSpree132  "saxton_hale/saxton_hale_132_kspree_"    //1-2
-#define HaleKillLast132  "saxton_hale/saxton_hale_132_last.wav"
-#define HaleStubbed132 "saxton_hale/saxton_hale_132_stub_"  //1-4
-//===New Vagineer's responces===
-#define VagineerRoundStart "saxton_hale/vagineer_responce_intro.wav"
-#define VagineerJump "saxton_hale/vagineer_responce_jump_"          //1-2
-#define VagineerRageSound2 "saxton_hale/vagineer_responce_rage_"            //1-4
-#define VagineerKSpreeNew "saxton_hale/vagineer_responce_taunt_"        //1-5
-#define VagineerFail "saxton_hale/vagineer_responce_fail_"          //1-2
+// Unused
+//#define ReloadEggModel          "models/player/saxton_hale/c_easter_cannonball.mdl"
+#endif
+
+// END FILE DEFINTIONS
+
 #define SOUNDEXCEPT_MUSIC 0
 #define SOUNDEXCEPT_VOICE 1
 #if defined _steamtools_included
@@ -869,75 +957,47 @@ public OnPluginEnd()
 {
     OnMapEnd();
 }
+
 AddToDownload()
 {
-    decl String:s[PLATFORM_MAX_PATH];
-    new String:extensions[][] = { ".mdl", ".dx80.vtx", ".dx90.vtx", ".sw.vtx", ".vvd", ".phy" };
-    new String:extensionsb[][] = { ".vtf", ".vmt" };
-    decl i;
-    for (i = 0; i < sizeof(extensions); i++)
-    {
-        Format(s, PLATFORM_MAX_PATH, "%s%s", HaleModelPrefix, extensions[i]);
-        if (FileExists(s, true)) AddFileToDownloadsTable(s);
+    /*
+        Files to precache that are originally part of TF2 or HL2 / etc and don't need to be downloaded
+    */
 
-        if (bSpecials)
-        {
-            Format(s, PLATFORM_MAX_PATH, "%s%s", VagineerModelPrefix, extensions[i]);
-            if (FileExists(s, true)) AddFileToDownloadsTable(s);
+    PrecacheSound("vo/announcer_am_capincite01.wav", true);
+    PrecacheSound("vo/announcer_am_capincite03.wav", true);
+    PrecacheSound("vo/announcer_am_capenabled02.wav", true);
 
-            Format(s, PLATFORM_MAX_PATH, "%s%s", HHHModelPrefix, extensions[i]);
-            if (FileExists(s, true)) AddFileToDownloadsTable(s);
+    //PrecacheSound("weapons/barret_arm_zap.wav", true);
+    PrecacheSound("player/doubledonk.wav", true);
 
-            Format(s, PLATFORM_MAX_PATH, "%s%s", CBSModelPrefix, extensions[i]);
-            if (FileExists(s, true)) AddFileToDownloadsTable(s);
+    /*
+        Files to download + precache that are not originally part of TF2 or HL2 / etc
+    */
+    
+    PrepareSound("saxton_hale/9000.wav");
 
-#if defined EASTER_BUNNY_ON
-            Format(s, PLATFORM_MAX_PATH, "%s%s", BunnyModelPrefix, extensions[i]);
-            if (FileExists(s, true)) AddFileToDownloadsTable(s);
-            Format(s, PLATFORM_MAX_PATH, "%s%s", EggModelPrefix, extensions[i]);
-            if (FileExists(s, true)) AddFileToDownloadsTable(s);
-//          Format(s, PLATFORM_MAX_PATH, "%s%s", ReloadEggModelPrefix, extensions[i]);
-//          if (FileExists(s, true)) AddFileToDownloadsTable(s);
-#endif
-        }
-    }
-    PrecacheModel(HaleModel, true);
-    if (bSpecials)
-    {
-        PrecacheModel(VagineerModel, true);
-        PrecacheModel(HHHModel, true);
-        PrecacheModel(CBSModel, true);
-#if defined EASTER_BUNNY_ON
-        PrecacheModel(BunnyModel, true);
-        PrecacheModel(EggModel, true);
-//      PrecacheModel(ReloadEggModel, true);
-        AddFileToDownloadsTable("materials/models/player/easter_demo/demoman_head_red.vmt");
-        AddFileToDownloadsTable("materials/models/player/easter_demo/easter_body.vmt");
-        AddFileToDownloadsTable("materials/models/player/easter_demo/easter_body.vtf");
-        AddFileToDownloadsTable("materials/models/player/easter_demo/easter_rabbit.vmt");
-        AddFileToDownloadsTable("materials/models/player/easter_demo/easter_rabbit.vtf");
-        AddFileToDownloadsTable("materials/models/player/easter_demo/easter_rabbit_normal.vtf");
-        AddFileToDownloadsTable("materials/models/props_easteregg/c_easteregg.vmt");
-        AddFileToDownloadsTable("materials/models/props_easteregg/c_easteregg.vtf");
-        AddFileToDownloadsTable("materials/models/props_easteregg/c_easteregg_gold.vmt");
-        AddFileToDownloadsTable("materials/models/player/easter_demo/eyeball_r.vmt");
-#endif
-    }
-    for (i = 0; i < sizeof(extensionsb); i++)
-    {
-        Format(s, PLATFORM_MAX_PATH, "materials/models/player/saxton_hale/eye%s", extensionsb[i]);
-        AddFileToDownloadsTable(s);
-        Format(s, PLATFORM_MAX_PATH, "materials/models/player/saxton_hale/hale_head%s", extensionsb[i]);
-        AddFileToDownloadsTable(s);
-        Format(s, PLATFORM_MAX_PATH, "materials/models/player/saxton_hale/hale_body%s", extensionsb[i]);
-        AddFileToDownloadsTable(s);
-        Format(s, PLATFORM_MAX_PATH, "materials/models/player/saxton_hale/hale_misc%s", extensionsb[i]);
-        AddFileToDownloadsTable(s);
-        Format(s, PLATFORM_MAX_PATH, "materials/models/player/saxton_hale/sniper_red%s", extensionsb[i]);
-        AddFileToDownloadsTable(s);
-        Format(s, PLATFORM_MAX_PATH, "materials/models/player/saxton_hale/sniper_lens%s", extensionsb[i]);
-        AddFileToDownloadsTable(s);
-    }
+    /*
+        All boss related files
+    */
+
+    // Saxton Hale
+
+    // Precache
+    // None.. he's all custom
+
+    // Download
+
+    PrepareModel(HaleModel);
+
+    PrepareMaterial("materials/models/player/saxton_hale/eye");
+    PrepareMaterial("materials/models/player/saxton_hale/hale_head");
+    PrepareMaterial("materials/models/player/saxton_hale/hale_body");
+    PrepareMaterial("materials/models/player/saxton_hale/hale_misc");
+    PrepareMaterial("materials/models/player/saxton_hale/sniper_red");
+    PrepareMaterial("materials/models/player/saxton_hale/sniper_lens");
+
+    //Saxton Hale Materials
     AddFileToDownloadsTable("materials/models/player/saxton_hale/sniper_head.vtf");
     AddFileToDownloadsTable("materials/models/player/saxton_hale/sniper_head_red.vmt");
     AddFileToDownloadsTable("materials/models/player/saxton_hale/hale_misc_normal.vtf");
@@ -946,251 +1006,235 @@ AddToDownload()
     AddFileToDownloadsTable("materials/models/player/saxton_hale/eyeball_r.vmt");
     AddFileToDownloadsTable("materials/models/player/saxton_hale/hale_egg.vtf");
     AddFileToDownloadsTable("materials/models/player/saxton_hale/hale_egg.vmt");
-    PrecacheSound(HaleComicArmsFallSound, true);
-    Format(s, PLATFORM_MAX_PATH, "sound/%s", HaleComicArmsFallSound);
-    AddFileToDownloadsTable(s);
-    Format(s, PLATFORM_MAX_PATH, "sound/%s", HaleKSpree);
-    PrecacheSound(HaleKSpree, true);
-    AddFileToDownloadsTable(s);
-    PrecacheSound("saxton_hale/9000.wav", true);
-    AddFileToDownloadsTable("sound/saxton_hale/9000.wav");
-//  PrecacheSound(HaleTempTheme, true);
 
+    PrepareSound(HaleComicArmsFallSound);
+    PrepareSound(HaleKSpree);
+
+    decl i, String:s[PLATFORM_MAX_PATH];
     for (i = 1; i <= 4; i++)
     {
         Format(s, PLATFORM_MAX_PATH, "%s0%i.wav", HaleLastB, i);
         PrecacheSound(s, true);
-        Format(s, PLATFORM_MAX_PATH, "%s0%i.wav", HHHLaught, i);
+        /*Format(s, PLATFORM_MAX_PATH, "%s0%i.wav", HHHLaught, i);
         PrecacheSound(s, true);
         Format(s, PLATFORM_MAX_PATH, "%s0%i.wav", HHHAttack, i);
-        PrecacheSound(s, true);
+        PrecacheSound(s, true);*/
     }
-    if (bSpecials)
-    {
-        PrecacheSound("ui/halloween_boss_summoned_fx.wav", true);
-        PrecacheSound("ui/halloween_boss_defeated_fx.wav", true);
-        PrecacheSound(VagineerLastA, true);
-        Format(s, PLATFORM_MAX_PATH, "sound/%s", VagineerLastA);
-        AddFileToDownloadsTable(s);
-        PrecacheSound(VagineerStart, true);
-        Format(s, PLATFORM_MAX_PATH, "sound/%s", VagineerStart);
-        AddFileToDownloadsTable(s);
-        PrecacheSound(VagineerRageSound, true);
-        Format(s, PLATFORM_MAX_PATH, "sound/%s", VagineerRageSound);
-        AddFileToDownloadsTable(s);
-        PrecacheSound(VagineerKSpree, true);
-        Format(s, PLATFORM_MAX_PATH, "sound/%s", VagineerKSpree);
-        AddFileToDownloadsTable(s);
-        PrecacheSound(VagineerKSpree2, true);
-        Format(s, PLATFORM_MAX_PATH, "sound/%s", VagineerKSpree2);
-        AddFileToDownloadsTable(s);
-        PrecacheSound(VagineerHit, true);
-        Format(s, PLATFORM_MAX_PATH, "sound/%s", VagineerHit);
-        AddFileToDownloadsTable(s);
-        PrecacheSound(HHHRage, true);
-        PrecacheSound(HHHRage2, true);
-        PrecacheSound(CBS0, true);
-        PrecacheSound(CBS1, true);
-        PrecacheSound(HHHTheme, true);
-        PrecacheSound(CBSTheme, true);
-        AddFileToDownloadsTable("sound/saxton_hale/the_millionaires_holiday.mp3");
-        PrecacheSound(CBSJump1, true);
-        for (i = 1; i <= 25; i++)
-        {
-            if (i <= 9)
-            {
-                Format(s, PLATFORM_MAX_PATH, "%s%02i.wav", CBS2, i);
-                PrecacheSound(s, true);
-            }
-            Format(s, PLATFORM_MAX_PATH, "%s%02i.wav", CBS4, i);
-            PrecacheSound(s, true);
-        }
-    }
-    PrecacheSound(HaleKillMedic, true);
-    Format(s, PLATFORM_MAX_PATH, "sound/%s", HaleKillMedic);
-    AddFileToDownloadsTable(s);
-    PrecacheSound(HaleKillSniper1, true);
-    Format(s, PLATFORM_MAX_PATH, "sound/%s", HaleKillSniper1);
-    AddFileToDownloadsTable(s);
-    PrecacheSound(HaleKillSniper2, true);
-    Format(s, PLATFORM_MAX_PATH, "sound/%s", HaleKillSniper2);
-    AddFileToDownloadsTable(s);
-    PrecacheSound(HaleKillSpy1, true);
-    Format(s, PLATFORM_MAX_PATH, "sound/%s", HaleKillSpy1);
-    AddFileToDownloadsTable(s);
-    PrecacheSound(HaleKillSpy2, true);
-    Format(s, PLATFORM_MAX_PATH, "sound/%s", HaleKillSpy2);
-    AddFileToDownloadsTable(s);
-    PrecacheSound(HaleKillEngie1, true);
-    Format(s, PLATFORM_MAX_PATH, "sound/%s", HaleKillEngie1);
-    AddFileToDownloadsTable(s);
-    PrecacheSound(HaleKillEngie2, true);
-    Format(s, PLATFORM_MAX_PATH, "sound/%s", HaleKillEngie2);
-    AddFileToDownloadsTable(s);
-    PrecacheSound(HaleKillDemo132, true);
-    Format(s, PLATFORM_MAX_PATH, "sound/%s", HaleKillDemo132);
-    AddFileToDownloadsTable(s);
-    PrecacheSound(HaleKillHeavy132, true);
-    Format(s, PLATFORM_MAX_PATH, "sound/%s", HaleKillHeavy132);
-    AddFileToDownloadsTable(s);
-    PrecacheSound(HaleKillScout132, true);
-    Format(s, PLATFORM_MAX_PATH, "sound/%s", HaleKillScout132);
-    AddFileToDownloadsTable(s);
-    PrecacheSound(HaleKillSpy132, true);
-    Format(s, PLATFORM_MAX_PATH, "sound/%s", HaleKillSpy132);
-    AddFileToDownloadsTable(s);
-    PrecacheSound(HaleKillPyro132, true);
-    Format(s, PLATFORM_MAX_PATH, "sound/%s", HaleKillPyro132);
-    AddFileToDownloadsTable(s);
-    PrecacheSound(HaleSappinMahSentry132, true);
-    Format(s, PLATFORM_MAX_PATH, "sound/%s", HaleSappinMahSentry132);
-    AddFileToDownloadsTable(s);
-    PrecacheSound(HaleKillLast132, true);
-    Format(s, PLATFORM_MAX_PATH, "sound/%s", HaleKillLast132);
-    AddFileToDownloadsTable(s);
-    PrecacheSound("vo/announcer_am_capincite01.wav", true);
-    PrecacheSound("vo/announcer_am_capincite03.wav", true);
-    PrecacheSound("vo/announcer_am_capenabled02.wav", true);
+
+    PrepareSound(HaleKillMedic);
+    PrepareSound(HaleKillSniper1);
+    PrepareSound(HaleKillSniper2);
+    PrepareSound(HaleKillSpy1);
+    PrepareSound(HaleKillSpy2);
+    PrepareSound(HaleKillEngie1);
+    PrepareSound(HaleKillEngie2);
+    PrepareSound(HaleKillDemo132);
+
+    PrepareSound(HaleKillHeavy132);
+    PrepareSound(HaleKillScout132);
+    PrepareSound(HaleKillSpy132);
+    PrepareSound(HaleKillPyro132);
+    PrepareSound(HaleSappinMahSentry132);
+    PrepareSound(HaleKillLast132);
+    PrepareSound(HaleKillDemo132);
+    PrepareSound(HaleKillDemo132);
+    PrepareSound(HaleKillDemo132);
+    PrepareSound(HaleKillDemo132);
+    PrepareSound(HaleKillDemo132);
+
     for (i = 1; i <= 5; i++)
     {
         if (i <= 2)
         {
             Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleJump, i);
-            PrecacheSound(s, true);
-            Format(s, PLATFORM_MAX_PATH, "sound/%s", s);
-            AddFileToDownloadsTable(s);
-            if (bSpecials)
-            {
-                Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerJump, i);
-                PrecacheSound(s, true);
-                Format(s, PLATFORM_MAX_PATH, "sound/%s", s);
-                AddFileToDownloadsTable(s);
-                Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerRageSound2, i);
-                PrecacheSound(s, true);
-                Format(s, PLATFORM_MAX_PATH, "sound/%s", s);
-                AddFileToDownloadsTable(s);
-                Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerFail, i);
-                PrecacheSound(s, true);
-                Format(s, PLATFORM_MAX_PATH, "sound/%s", s);
-                AddFileToDownloadsTable(s);
-            }
+            PrepareSound(s);
+
+            /*Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerJump, i);
+            PrepareSound(s);
+
+            Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerRageSound2, i);
+            PrepareSound(s);
+
+            Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerFail, i);
+            PrepareSound(s);*/
+
             Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleWin, i);
-            PrecacheSound(s, true);
-            Format(s, PLATFORM_MAX_PATH, "sound/%s", s);
-            AddFileToDownloadsTable(s);
+            PrepareSound(s);
+
             Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleJump132, i);
-            PrecacheSound(s, true);
-            Format(s, PLATFORM_MAX_PATH, "sound/%s", s);
-            AddFileToDownloadsTable(s);
+            PrepareSound(s);
+
             Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleKillEngie132, i);
-            PrecacheSound(s, true);
-            Format(s, PLATFORM_MAX_PATH, "sound/%s", s);
-            AddFileToDownloadsTable(s);
+            PrepareSound(s);
+
             Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleKillKSpree132, i);
-            PrecacheSound(s, true);
-            Format(s, PLATFORM_MAX_PATH, "sound/%s", s);
-            AddFileToDownloadsTable(s);
+            PrepareSound(s);
         }
+
         if (i <= 3)
         {
             Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleFail, i);
-            PrecacheSound(s, true);
-            Format(s, PLATFORM_MAX_PATH, "sound/%s", s);
-            AddFileToDownloadsTable(s);
+            PrepareSound(s);
         }
+
         if (i <= 4)
         {
             Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleRageSound, i);
-            PrecacheSound(s, true);
-            Format(s, PLATFORM_MAX_PATH, "sound/%s", s);
-            AddFileToDownloadsTable(s);
+            PrepareSound(s);
+
             Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleStubbed132, i);
-            PrecacheSound(s, true);
-            Format(s, PLATFORM_MAX_PATH, "sound/%s", s);
-            AddFileToDownloadsTable(s);
+            PrepareSound(s);
         }
+
         Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleRoundStart, i);
-        PrecacheSound(s, true);
-        Format(s, PLATFORM_MAX_PATH, "sound/%s", s);
-        AddFileToDownloadsTable(s);
-        if (bSpecials)
-        {
-            PrecacheSound(VagineerRoundStart, true);
-            Format(s, PLATFORM_MAX_PATH, "sound/%s", VagineerRoundStart);
-            AddFileToDownloadsTable(s);
-            Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerKSpreeNew, i);
-            PrecacheSound(s, true);
-            Format(s, PLATFORM_MAX_PATH, "sound/%s", s);
-            AddFileToDownloadsTable(s);
-        }
+        PrepareSound(s);
+
+        //Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerKSpreeNew, i);
+        //PrepareSound(s);
+
         Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleKSpreeNew, i);
-        PrecacheSound(s, true);
-        Format(s, PLATFORM_MAX_PATH, "sound/%s", s);
-        AddFileToDownloadsTable(s);
+        PrepareSound(s);
+
         Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleLastMan, i);
-        PrecacheSound(s, true);
-        Format(s, PLATFORM_MAX_PATH, "sound/%s", s);
-        AddFileToDownloadsTable(s);
+        PrepareSound(s);
+
         Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleStart132, i);
-        PrecacheSound(s, true);
-        Format(s, PLATFORM_MAX_PATH, "sound/%s", s);
-        AddFileToDownloadsTable(s);
+        PrepareSound(s);
     }
-    PrecacheSound("vo/engineer_no01.wav", true);
-    PrecacheSound("vo/engineer_jeers02.wav", true);
+
+    if (!bSpecials)
+    {
+        return;
+    }
+
+    // Christian Brutal Sniper
+
+    // Precache
+
+    PrecacheSound(CBS0, true);
+    PrecacheSound(CBS1, true);
+    PrecacheSound(CBS3, true);
+    PrecacheSound(CBSJump1, true);
+
+    for (i = 1; i <= 25; i++)
+    {
+        if (i <= 9)
+        {
+            Format(s, PLATFORM_MAX_PATH, "%s%02i.wav", CBS2, i);
+            PrecacheSound(s, true);
+        }
+        Format(s, PLATFORM_MAX_PATH, "%s%02i.wav", CBS4, i);
+        PrecacheSound(s, true);
+    }
+
     PrecacheSound("vo/sniper_dominationspy04.wav", true);
+
+    // Download
+
+    PrepareModel(CBSModel);
+
+    PrepareSound(CBSTheme);
+
+
+    // Horseless Headless Horsemann
+
+    // Precache
+
+    PrecacheSound(HHHRage, true);
+    PrecacheSound(HHHRage2, true);
+
+    for (i = 1; i <= 4; i++)
+    {
+        Format(s, PLATFORM_MAX_PATH, "%s0%i.wav", HHHLaught, i);
+        PrecacheSound(s, true);
+        Format(s, PLATFORM_MAX_PATH, "%s0%i.wav", HHHAttack, i);
+        PrecacheSound(s, true);
+    }
+
+    PrecacheSound("ui/halloween_boss_summoned_fx.wav", true);
+    PrecacheSound("ui/halloween_boss_defeated_fx.wav", true);
+
     PrecacheSound("vo/halloween_boss/knight_pain01.wav", true);
     PrecacheSound("vo/halloween_boss/knight_pain02.wav", true);
     PrecacheSound("vo/halloween_boss/knight_pain03.wav", true);
     PrecacheSound("vo/halloween_boss/knight_death01.wav", true);
     PrecacheSound("vo/halloween_boss/knight_death02.wav", true);
-    //PrecacheSound("weapons/barret_arm_zap.wav", true);
-    PrecacheSound("player/doubledonk.wav", true);
+
     PrecacheSound("misc/halloween/spell_teleport.wav", true);
-#if defined EASTER_BUNNY_ON
-    for (i = 0; i < sizeof(BunnyWin); i++)
+
+    // Download
+
+    PrepareModel(HHHModel);
+    PrepareSound(HHHTheme);
+
+
+    // Vagineer
+
+    // Precache
+
+    PrecacheSound("vo/engineer_no01.wav", true);
+    PrecacheSound("vo/engineer_jeers02.wav", true);
+
+    // Download
+
+    PrepareModel(VagineerModel);
+
+    PrepareSound(VagineerLastA);
+    PrepareSound(VagineerStart);
+    PrepareSound(VagineerRageSound);
+    PrepareSound(VagineerKSpree);
+    PrepareSound(VagineerKSpree2);
+    PrepareSound(VagineerHit);
+
+    for (i = 1; i <= 5; i++)
     {
-        PrecacheSound(BunnyWin[i], true);
-    }
-    for (i = 0; i < sizeof(BunnyJump); i++)
-    {
-        PrecacheSound(BunnyJump[i], true);
-    }
-    for (i = 0; i < sizeof(BunnyRage); i++)
-    {
-        PrecacheSound(BunnyRage[i], true);
-    }
-    for (i = 0; i < sizeof(BunnyFail); i++)
-    {
-        PrecacheSound(BunnyFail[i], true);
-    }
-    for (i = 0; i < sizeof(BunnyKill); i++)
-    {
-        PrecacheSound(BunnyKill[i], true);
-    }
-    for (i = 0; i < sizeof(BunnySpree); i++)
-    {
-        PrecacheSound(BunnySpree[i], true);
-    }
-    for (i = 0; i < sizeof(BunnyLast); i++)
-    {
-        PrecacheSound(BunnyLast[i], true);
-    }
-    for (i = 0; i < sizeof(BunnyPain); i++)
-    {
-        PrecacheSound(BunnyPain[i], true);
-    }
-    for (i = 0; i < sizeof(BunnyStart); i++)
-    {
-        PrecacheSound(BunnyStart[i], true);
-    }
-    for (i = 0; i < sizeof(BunnyRandomVoice); i++)
-    {
-        PrecacheSound(BunnyRandomVoice[i], true);
+        if (i <= 2)
+        {
+            Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerJump, i);
+            PrepareSound(s);
+
+            Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerRageSound2, i);
+            PrepareSound(s);
+
+            Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerFail, i);
+            PrepareSound(s);
+        }
+
+        Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerKSpreeNew, i);
+        PrepareSound(s);
     }
 
+    PrepareSound(VagineerRoundStart);
+
+#if defined EASTER_BUNNY_ON
+    // Easter Bunny
+
+    // Precache
+
+    PrecacheSoundList(BunnyWin);
+    PrecacheSoundList(BunnyJump);
+    PrecacheSoundList(BunnyRage);
+    PrecacheSoundList(BunnyFail);
+    PrecacheSoundList(BunnyKill);
+    PrecacheSoundList(BunnySpree);
+    PrecacheSoundList(BunnyLast);
+    PrecacheSoundList(BunnyPain);
+    PrecacheSoundList(BunnyStart);
+    PrecacheSoundList(BunnyRandomVoice);
+
+    // Download
+
+    PrepareModel(BunnyModel);
+    PrepareModel(EggModel);
+    // PrepareModel(ReloadEggModel);
+
+    DownloadMaterialList(BunnyMaterials);
+
+    PrepareMaterial("materials/models/props_easteregg/c_easteregg");
+    AddFileToDownloadsTable("materials/models/props_easteregg/c_easteregg_gold.vmt");
 #endif
 }
+
 public CvarChange(Handle:convar, const String:oldValue[], const String:newValue[])
 {
     if (convar == cvarHaleSpeed)
@@ -1238,6 +1282,7 @@ public CvarChange(Handle:convar, const String:oldValue[], const String:newValue[
         }
     }
 }
+
 public Action:Timer_Announce(Handle:hTimer)
 {
     static announcecount=-1;
@@ -7718,7 +7763,7 @@ stock IncrementHeadCount(iClient)
 {
     InsertCond(iClient, TFCond_DemoBuff);
     SetEntProp(iClient, Prop_Send, "m_iDecapitations", GetEntProp(iClient, Prop_Send, "m_iDecapitations") + 1);
-    AddPlayerHealth(iClient, 15, 900000, true);             //  The old version of this allowed infinite health gain... so ;v
+    AddPlayerHealth(iClient, 15, 300, true);             //  The old version of this allowed infinite health gain... so ;v
     TF2_AddCondition(iClient, TFCond_SpeedBuffAlly, 0.01);  //  Recalculate their speed
 }
 
@@ -7911,6 +7956,95 @@ stock AddPlayerHealth(iClient, iAdd, iOverheal = 0, bStaticMax = false)
         iNewHealth = min(iNewHealth, iMax);
         SetEntityHealth(iClient, iNewHealth);
     }
+}
+
+stock PrepareSound(const String:szSoundPath[])
+{
+    PrecacheSound(szSoundPath, true);
+    decl String:s[PLATFORM_MAX_PATH];
+    Format(s, sizeof(s), "sound/%s", szSoundPath);
+    AddFileToDownloadsTable(s);
+}
+
+stock DownloadSoundList(const String:szFileList[][], iSize = sizeof(szFileList))
+{
+    for (new i = 0; i < iSize; i++)
+    {
+        PrepareSound(szFileList[i]);
+    }
+}
+
+stock PrecacheSoundList(const String:szFileList[][], iSize = sizeof(szFileList))
+{
+    for (new i = 0; i < iSize; i++)
+    {
+        PrecacheSound(szFileList[i], true);
+    }
+}
+
+// Adds both a .vmt and .vtf to downloads - must exclude extension
+stock PrepareMaterial(const String:szMaterialPath[])
+{
+    decl String:s[PLATFORM_MAX_PATH];
+    Format(s, sizeof(s), "%s%s", szMaterialPath, ".vtf");
+    AddFileToDownloadsTable(s);
+    Format(s, sizeof(s), "%s%s", szMaterialPath, ".vmt");
+    AddFileToDownloadsTable(s);
+}
+
+stock DownloadMaterialList(const String:szFileList[][], iSize = sizeof(szFileList))
+{
+    decl String:s[PLATFORM_MAX_PATH];
+    for (new i = 0; i < iSize; i++)
+    {
+        strcopy(s, sizeof(s), szFileList[i]);
+        AddFileToDownloadsTable(s); // if (FileExists(s, true))
+    }
+}
+
+stock PrepareModel(const String:szModelPath[], bool:bMdlOnly = false)
+{
+    decl String:szBase[PLATFORM_MAX_PATH];
+    decl String:szPath[PLATFORM_MAX_PATH];
+    strcopy(szBase, sizeof(szBase), szModelPath);
+    SplitString(szBase, ".mdl", szBase, sizeof(szBase));
+    
+    if (!bMdlOnly)
+    {
+        Format(szPath, sizeof(szPath), "%s.phy", szBase);
+        if (FileExists(szPath))
+        {
+            AddFileToDownloadsTable(szPath);
+        }
+        
+        Format(szPath, sizeof(szPath), "%s.sw.vtx", szBase);
+        if (FileExists(szPath))
+        {
+            AddFileToDownloadsTable(szPath);
+        }
+        
+        Format(szPath, sizeof(szPath), "%s.vvd", szBase);
+        if (FileExists(szPath))
+        {
+            AddFileToDownloadsTable(szPath);
+        }
+        
+        Format(szPath, sizeof(szPath), "%s.dx80.vtx", szBase);
+        if (FileExists(szPath))
+        {
+            AddFileToDownloadsTable(szPath);
+        }
+        
+        Format(szPath, sizeof(szPath), "%s.dx90.vtx", szBase);
+        if (FileExists(szPath))
+        {
+            AddFileToDownloadsTable(szPath);
+        }
+    }
+    
+    AddFileToDownloadsTable(szModelPath);
+    
+    return PrecacheModel(szModelPath, true);
 }
 
 #endinput
