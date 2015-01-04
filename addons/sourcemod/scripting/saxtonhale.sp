@@ -9,7 +9,9 @@
     
     New plugin thread on AlliedMods: https://forums.alliedmods.net/showthread.php?p=2167912
 */
-
+#if SOURCEMOD_V_MINOR > 6
+  #pragma newdecls required
+#endif
 #define PLUGIN_VERSION "1.52"
 
 #pragma semicolon 1
