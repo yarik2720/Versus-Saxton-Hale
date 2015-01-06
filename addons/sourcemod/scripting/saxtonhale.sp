@@ -54,6 +54,8 @@
 
 #define EASTER_BUNNY_ON
 
+//#define OVERRIDE_MEDIGUNS_ON
+
 // m_lifeState
 enum
 {
@@ -2878,6 +2880,19 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
             return Plugin_Changed;
         }
     }
+	#if defined OVERRIDE_MEDIGUNS_ON
+	//Medic mediguns
+	if (TF2_GetPlayerClass(client) == TFClass_Medic && (strncmp(classname, "tf_weapon_medigun", 17, false) == 0))
+	{
+		new Handle:hItemOverride;
+		hItemOverride = PrepareItemHandle(hItem, _, _, "18 ; 0.0 ; 10 ; 1.25 ; 178 ; 0.75 ; 144 ; 2.0", true);
+		if (hItemOverride != INVALID_HANDLE)
+		{
+			hItem = hItemOverride;
+			return Plugin_Changed;
+		}
+	}
+	#endif
     return Plugin_Continue;
 }
 Handle:PrepareItemHandle(Handle:hItem, String:name[] = "", index = -1, const String:att[] = "", bool:dontpreserve = false)
@@ -3097,6 +3112,12 @@ public Action:MakeNoHale(Handle:hTimer, any:clientid)
     if (TF2_GetPlayerClass(client) == TFClass_Medic)
     {
         weapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary);
+        #if defined OVERRIDE_MEDIGUNS_ON
+        if (GetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel") < 0.41)
+            SetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel", 0.41);
+        #endif
+        
+        #if !defined OVERRIDE_MEDIGUNS_ON
         new mediquality = (weapon > MaxClients && IsValidEdict(weapon) ? GetEntProp(weapon, Prop_Send, "m_iEntityQuality") : -1);
         if (mediquality != 10)
         {
@@ -3109,6 +3130,7 @@ public Action:MakeNoHale(Handle:hTimer, any:clientid)
             }
             SetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel", 0.41);
         }
+        #endif
     }
     return Plugin_Continue;
 }
