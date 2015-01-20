@@ -28,7 +28,7 @@ install:
     - cd addons/sourcemod
 before_script:
     - cd ./scripting/
-    - wget "http://www.doctormckay.com/download/scripting/include/morecolors.inc"
+    - wget "https://forums.alliedmods.net/attachment.php?attachmentid=141740" -O morecolors.inc
     - mv morecolors.inc include/
     - chmod +x spcomp
     - mkdir compiled

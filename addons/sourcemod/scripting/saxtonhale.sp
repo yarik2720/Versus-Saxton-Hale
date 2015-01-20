@@ -9,18 +9,18 @@
     
     New plugin thread on AlliedMods: https://forums.alliedmods.net/showthread.php?p=2167912
 */
+#define PLUGIN_VERSION "1.52"
+#pragma semicolon 1
+#include <sdkhooks>
+#include <tf2_stocks>
+#include <tf2items>
+#include <regex>
 #if SOURCEMOD_V_MINOR > 6
   #pragma newdecls required
 #endif
-#define PLUGIN_VERSION "1.52"
-
-#pragma semicolon 1
-#include <sourcemod>
-#include <sdkhooks>
-#include <tf2_stocks>
 #include <morecolors>
+#include <sourcemod>
 #include <nextmap>
-#include <tf2items>
 #include <clientprefs>
 
 #include <saxtonhale>
