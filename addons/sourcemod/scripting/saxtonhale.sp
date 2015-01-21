@@ -721,6 +721,14 @@ public OnPluginStart()
     //cvarForceSpecToHale = CreateConVar("hale_spec_force_boss", "0", "1- if a spectator is up next, will force them to Hale + spectators will gain queue points, else spectators are ignored by plugin", FCVAR_PLUGIN, true, 0.0, true, 1.0);
     cvarEnableEurekaEffect = CreateConVar("hale_enable_eureka", "0", "1- allow Eureka Effect, else disallow", FCVAR_PLUGIN, true, 0.0, true, 1.0);
     cvarForceHaleTeam = CreateConVar("hale_force_team", "0", "0- Use plugin logic, 1- random team, 2- red, 3- blue", FCVAR_PLUGIN, true, 0.0, true, 3.0);
+    
+    // bFriendlyFire = GetConVarBool(FindConVar("mp_friendlyfire"));
+    // HookConVarChange(FindConVar("mp_friendlyfire"), HideCvarNotify);
+    HookConVarChange(FindConVar("tf_bot_count"), HideCvarNotify);
+    HookConVarChange(FindConVar("tf_arena_use_queue"), HideCvarNotify);
+    HookConVarChange(FindConVar("tf_arena_first_blood"), HideCvarNotify);
+    HookConVarChange(FindConVar("mp_friendlyfire"), HideCvarNotify);
+
     HookEvent("teamplay_round_start", event_round_start);
     HookEvent("teamplay_round_win", event_round_end);
     HookEvent("player_changeclass", event_changeclass);
@@ -1251,6 +1259,18 @@ AddToDownload()
     PrepareMaterial("materials/models/props_easteregg/c_easteregg");
     AddFileToDownloadsTable("materials/models/props_easteregg/c_easteregg_gold.vmt");
 #endif
+}
+
+public HideCvarNotify(Handle:convar, const String:oldValue[], const String:newValue[])
+{
+    new Handle:svtags = FindConVar("sv_tags");
+    new sflags = GetConVarFlags(svtags);
+    sflags &= ~FCVAR_NOTIFY;
+    SetConVarFlags(svtags, sflags);
+
+    new flags = GetConVarFlags(convar);
+    flags &= ~FCVAR_NOTIFY;
+    SetConVarFlags(convar, flags);
 }
 
 public CvarChange(Handle:convar, const String:oldValue[], const String:newValue[])
