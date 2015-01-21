@@ -56,6 +56,15 @@
 
 //#define OVERRIDE_MEDIGUNS_ON
 
+// TF2 Weapon Loadout Slots
+enum
+{
+    TFWeaponSlot_DisguiseKit = 3,
+    TFWeaponSlot_Watch = 4,
+    TFWeaponSlot_DestroyKit = 4,
+    TFWeaponSlot_BuildKit = 5
+}
+
 // m_lifeState
 enum
 {
@@ -332,6 +341,8 @@ new RedAlivePlayers;
 new RoundCount;
 new Special;
 new Incoming;
+
+static bool:g_bReloadVSHOnRoundEnd = false;
 
 new Damage[TF_MAX_PLAYERS];
 new AirDamage[TF_MAX_PLAYERS]; // Air Strike
@@ -737,6 +748,8 @@ public OnPluginStart()
     HookConVarChange(cvarDisplayHaleHP, CvarChange);
     HookConVarChange(cvarRageSentry, CvarChange);
     //HookConVarChange(cvarCircuitStun, CvarChange);
+    g_bReloadVSHOnRoundEnd = false;
+    RegAdminCmd("sm_hale_reload", Debug_ReloadVSH, ADMFLAG_ROOT, "Reloads the VSH plugin safely and silently.");
     RegConsoleCmd("sm_hale", HalePanel);
     RegConsoleCmd("sm_hale_hp", Command_GetHPCmd);
     RegConsoleCmd("sm_halehp", Command_GetHPCmd);
@@ -887,7 +900,8 @@ public OnConfigsExecuted()
         mp_forcecamera = GetConVarInt(FindConVar("mp_forcecamera"));
         tf_scout_hype_pep_max = GetConVarFloat(FindConVar("tf_scout_hype_pep_max"));
         SetConVarInt(FindConVar("tf_arena_use_queue"), 0);
-        SetConVarInt(FindConVar("mp_teams_unbalance_limit"), GetConVarBool(cvarFirstRound)?0:1);
+        SetConVarInt(FindConVar("mp_teams_unbalance_limit"), TF2_GetRoundWinCount() ? 0 : 1); // s_bLateLoad ? 0 : 
+        //SetConVarInt(FindConVar("mp_teams_unbalance_limit"), GetConVarBool(cvarFirstRound)?0:1);
         SetConVarInt(FindConVar("tf_arena_first_blood"), 0);
         SetConVarInt(FindConVar("mp_forcecamera"), 0);
         SetConVarFloat(FindConVar("tf_scout_hype_pep_max"), 100.0);
@@ -1633,7 +1647,7 @@ public Action:event_round_start(Handle:event, const String:name[], bool:dontBroa
         return Plugin_Continue;
     }
 
-    SetConVarInt(FindConVar("mp_teams_unbalance_limit"), 0);
+    SetConVarInt(FindConVar("mp_teams_unbalance_limit"), TF2_GetRoundWinCount() ? 0 : 1); // s_bLateLoad ? 0 : 
 
     if (FixUnbalancedTeams())
     {
@@ -1916,6 +1930,13 @@ public Action:event_round_end(Handle:event, const String:name[], bool:dontBroadc
         CPrintToChatAll("{olive}[VSH]{default} %t", "vsh_nextmap", s2);
     }
     RoundCount++;
+
+    if (g_bReloadVSHOnRoundEnd)
+    {
+        SetClientQueuePoints(Hale, 0);
+        ServerCommand("sm plugins reload saxtonhale");
+    }
+
     if (!g_bEnabled)
     {
         return Plugin_Continue;
@@ -2084,7 +2105,7 @@ CalcScores()
                 if (IsFakeClient(Hale)) botqueuepoints = 0;
                 else SetClientQueuePoints(i, 0);
             }
-            else if (!IsFakeClient(i) && (GetEntityTeamNum(i) > _:TFTeam_Spectator || spec))
+            else if (!IsFakeClient(i) && (GetEntityTeamNum(i) > _:TFTeam_Spectator))
             {
                 CPrintToChat(i, "{olive}[VSH]{default} %t", "vsh_add_points", 10);
                 SetClientQueuePoints(i, GetClientQueuePoints(i)+10);
@@ -7453,6 +7474,28 @@ public Native_GetDamage(Handle:plugin, numParams)
     return Damage[client];
 }
 
+// Chdata's plugin reload command
+public Action:Debug_ReloadVSH(iClient, iArgc)
+{
+    g_bReloadVSHOnRoundEnd = true;
+    switch (VSHRoundState)
+    {
+        case VSHRState_End, VSHRState_Disabled:
+        {
+            CReplyToCommand(iClient, "{olive}[VSH]{default} The plugin has been reloaded.");
+            SetClientQueuePoints(Hale, 0);
+            ServerCommand("sm plugins reload saxtonhale");
+        }
+        default:
+        {
+            CReplyToCommand(iClient, "{olive}[VSH]{default} The plugin is set to reload.");
+            SetClientQueuePoints(Hale, 0);
+        }
+    }
+    return Plugin_Handled;
+}
+
+
 /*
     chdata.inc
 
@@ -8096,8 +8139,6 @@ stock PrepareModel(const String:szModelPath[], bool:bMdlOnly = false)
     return PrecacheModel(szModelPath, true);
 }
 
-#endinput
-
 /*
     Returns the the TeamNum of an entity.
     Works for both clients and things like healthpacks.
@@ -8155,4 +8196,12 @@ stock bool:IsSpectator(iClient)
 stock bool:IsReplayClient(iClient)
 {
     return IsClientReplay(iClient) || IsClientSourceTV(iClient);
+}
+
+/*
+    Returns the number of times any team has won a round.
+*/
+stock TF2_GetRoundWinCount()
+{
+    return GetTeamScore(TEAM_RED) + GetTeamScore(TEAM_BLU);
 }
