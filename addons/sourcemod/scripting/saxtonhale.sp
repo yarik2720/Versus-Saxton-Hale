@@ -2029,7 +2029,7 @@ public Action:event_round_end(Handle:event, const String:name[], bool:dontBroadc
         }
         new top[3];
         Damage[0] = 0;
-        for (new i = 0; i <= MaxClients; i++)
+        for (new i = 1; i <= MaxClients; i++)
         {
             if (Damage[i] >= Damage[top[0]])
             {
@@ -3743,7 +3743,7 @@ public Action:ClientTimer(Handle:hTimer)
             if (!IsPlayerAlive(client))
             {
                 new obstarget = GetEntPropEnt(client, Prop_Send, "m_hObserverTarget");
-                if (IsClientInGame(obstarget) && obstarget != Hale && obstarget != client)
+                if (IsValidClient(obstarget) && obstarget != Hale && obstarget != client)
                 {
                     if (!(GetClientButtons(client) & IN_SCORE)) ShowSyncHudText(client, rageHUD, "Damage: %d - %N's Damage: %d", Damage[client], obstarget, Damage[obstarget]);
                 }
