@@ -4289,7 +4289,8 @@ public Action:HaleTimer(Handle:hTimer)
 
 public Action:HHHTeleTimer(Handle:timer)
 {
-    SetEntProp(Hale, Prop_Send, "m_CollisionGroup", 5); //Fix HHH's clipping.
+    if (IsValidClient(Hale))
+        SetEntProp(Hale, Prop_Send, "m_CollisionGroup", 5); //Fix HHH's clipping.
     hHHHTeleTimer = INVALID_HANDLE;
 }
 
