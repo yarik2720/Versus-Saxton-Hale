@@ -34,6 +34,18 @@
 #tryinclude <tf2attributes>
 //#define REQUIRE_PLUGIN
 
+
+#define CBS_MAX_ARROWS 9
+
+#define EASTER_BUNNY_ON
+
+#define HALEHHH_TELEPORTCHARGETIME 2
+#define HALE_JUMPCHARGETIME 1
+
+#define HALEHHH_TELEPORTCHARGE (25 * HALEHHH_TELEPORTCHARGETIME)
+#define HALE_JUMPCHARGE (25 * HALE_JUMPCHARGETIME)
+
+
 #define TF_MAX_PLAYERS          34             //  Sourcemod supports up to 64 players? Too bad TF2 doesn't. 33 player server +1 for 0 (console/world)
 #define MAX_ENTITIES            2049           //  This is probably TF2 specific
 #define MAX_CENTER_TEXT         192            //  PrintCenterText()
@@ -44,15 +56,9 @@
 #define TEAM_RED                2
 #define TEAM_BLU                3
 
-#define HALEHHH_TELEPORTCHARGETIME 2
-#define HALE_JUMPCHARGETIME 1
-
-#define HALEHHH_TELEPORTCHARGE (25 * HALEHHH_TELEPORTCHARGETIME)
-#define HALE_JUMPCHARGE (25 * HALE_JUMPCHARGETIME)
-
-#define CBS_MAX_ARROWS 9
-
-#define EASTER_BUNNY_ON
+#define MAX_INT                 2147483647     //  PriorityCenterText
+#define MIN_INT                 -2147483648    //  PriorityCenterText
+#define MAX_DIGITS              12             //  10 + \0 for IntToString. And negative signs.
 
 //#define OVERRIDE_MEDIGUNS_ON
 
@@ -373,7 +379,6 @@ new Float:GlowTimer;
 new bool:bEnableSuperDuperJump;
 new bool:bTenSecStart[2] = {false, false};
 new bool:bSpawnTeleOnTriggerHurt = false;
-new Handle:hHHHTeleTimer = INVALID_HANDLE;
 new HHHClimbCount;
 new bool:bNoTaunt = false;
 new Handle:cvarVersion;
@@ -940,13 +945,14 @@ public OnMapStart()
 {
     HPTime = 0.0;
     KSpreeTimer = 0.0;
-    MusicTimer = INVALID_HANDLE;
-    hHHHTeleTimer = INVALID_HANDLE;
     TeamRoundCounter = 0;
+    MusicTimer = INVALID_HANDLE;
     doorchecktimer = INVALID_HANDLE;
     Hale = -1;
     for (new i = 1; i <= MaxClients; i++)
+    {
         VSHFlags[i] = 0;
+    }
     if (IsSaxtonHaleMap(true))
     {
         AddToDownload();
@@ -973,11 +979,8 @@ public OnMapEnd()
         }
 #endif
     }
-    if (MusicTimer != INVALID_HANDLE)
-    {
-        KillTimer(MusicTimer);
-        MusicTimer = INVALID_HANDLE;
-    }
+
+    ClearTimer(MusicTimer);
 }
 public OnPluginEnd()
 {
@@ -1567,16 +1570,7 @@ public Action:event_round_start(Handle:event, const String:name[], bool:dontBroa
         return Plugin_Continue;
     if (FileExists("bNextMapToHale"))
         DeleteFile("bNextMapToHale");
-    if (MusicTimer != INVALID_HANDLE)
-    {
-        KillTimer(MusicTimer);
-        MusicTimer = INVALID_HANDLE;
-    }
-    if (hHHHTeleTimer != INVALID_HANDLE)
-    {
-        KillTimer(hHHHTeleTimer);
-        hHHHTeleTimer = INVALID_HANDLE;
-    }
+    ClearTimer(MusicTimer);
     KSpreeCount = 0;
     CheckArena();
     GetCurrentMap(currentmap, sizeof(currentmap));
@@ -1993,11 +1987,7 @@ public Action:event_round_end(Handle:event, const String:name[], bool:dontBroadc
         if (!IsClientInGame(i)) continue;
         StopHaleMusic(i);
     }
-    if (MusicTimer != INVALID_HANDLE)
-    {
-        KillTimer(MusicTimer);
-        MusicTimer = INVALID_HANDLE;
-    }
+    ClearTimer(MusicTimer);
     if (IsClientInGame(Hale))
     {
         SetEntProp(Hale, Prop_Send, "m_bGlowEnabled", 0);
@@ -2226,11 +2216,7 @@ public Action:Timer_MusicPlay(Handle:timer)
     if (VSHRoundState != VSHRState_Active) return Plugin_Stop;
     new String:sound[PLATFORM_MAX_PATH] = "";
     new Float:time = -1.0;
-    if (MusicTimer != INVALID_HANDLE)
-    {
-        KillTimer(MusicTimer);
-        MusicTimer = INVALID_HANDLE;
-    }
+    ClearTimer(MusicTimer);
     if (MapHasMusic())
     {
         strcopy(sound, sizeof(sound), "");
@@ -2331,11 +2317,7 @@ public Action:Timer_MusicTheme(Handle:timer, any:pack)
                 if (time2 != time)
                 {
                     time = time2;
-                    if (MusicTimer != INVALID_HANDLE)
-                    {
-                        KillTimer(MusicTimer);
-                        MusicTimer = INVALID_HANDLE;
-                    }
+                    ClearTimer(MusicTimer);
                     if (time != -1.0)
                     {
                         new Handle:datapack;
@@ -2962,9 +2944,9 @@ Handle:PrepareItemHandle(Handle:hItem, String:name[] = "", index = -1, const Str
             {
                 new bool:dontAdd = false;
                 new attribIndex = TF2Items_GetAttributeId(hItem, i);
-                for (new z = 0; z < attribCount+i; z += 2)
+                for (new j = 0; j < attribCount+i; j += 2)
                 {
-                    if (StringToInt(weaponAttribsArray[z]) == attribIndex)
+                    if (StringToInt(weaponAttribsArray[j]) == attribIndex)
                     {
                         dontAdd = true;
                         break;
@@ -3483,7 +3465,7 @@ public Action:Command_Points(client, args)
         CReplyToCommand(client, "{olive}[VSH]{default} Usage: hale_addpoints <target> <points>");
         return Plugin_Handled;
     }
-    decl String:s2[80];
+    decl String:s2[MAX_DIGITS];
     decl String:targetname[PLATFORM_MAX_PATH];
     GetCmdArg(1, targetname, sizeof(targetname));
     GetCmdArg(2, s2, sizeof(s2));
@@ -3676,7 +3658,10 @@ public Action:event_player_spawn(Handle:event, const String:name[], bool:dontBro
     if (!g_bEnabled) return Plugin_Continue;
     SetVariantString("");
     AcceptEntityInput(client, "SetCustomModel");
-    if (client == Hale && VSHRoundState < VSHRState_End && VSHRoundState != VSHRState_Disabled) CreateTimer(0.1, MakeHale);
+    if (client == Hale && VSHRoundState < VSHRState_End && VSHRoundState != VSHRState_Disabled)
+    {
+        CreateTimer(0.1, MakeHale);
+    }
 
     if (VSHRoundState != VSHRState_Disabled)
     {
@@ -3737,13 +3722,13 @@ public Action:ClientTimer(Handle:hTimer)
     new i = -1;
     for (new client = 1; client <= MaxClients; client++)
     {
-        if (IsClientInGame(client) && client != Hale && GetEntityTeamNum(client) == OtherTeam)
+        if (client != Hale && IsClientInGame(client) && GetEntityTeamNum(client) == OtherTeam)
         {
             SetHudTextParams(-1.0, 0.88, 0.35, 90, 255, 90, 255, 0, 0.35, 0.0, 0.1);
             if (!IsPlayerAlive(client))
             {
                 new obstarget = GetEntPropEnt(client, Prop_Send, "m_hObserverTarget");
-                if (IsValidClient(obstarget) && obstarget != Hale && obstarget != client)
+                if (obstarget != Hale && IsValidClient(obstarget) && obstarget != client)
                 {
                     if (!(GetClientButtons(client) & IN_SCORE)) ShowSyncHudText(client, rageHUD, "Damage: %d - %N's Damage: %d", Damage[client], obstarget, Damage[obstarget]);
                 }
@@ -4141,7 +4126,7 @@ public Action:HaleTimer(Handle:hTimer)
                     if (TF2_GetPlayerClass(target) != TFClass_Scout && TF2_GetPlayerClass(target) != TFClass_Soldier)
                     {
                         SetEntProp(Hale, Prop_Send, "m_CollisionGroup", 2); //Makes HHH clipping go away for player and some projectiles
-                        hHHHTeleTimer = CreateTimer(bEnableSuperDuperJump ? 4.0:2.0, HHHTeleTimer, TIMER_FLAG_NO_MAPCHANGE);
+                        CreateTimer(bEnableSuperDuperJump ? 4.0:2.0, HHHTeleTimer, _, TIMER_FLAG_NO_MAPCHANGE);
                     }
 
                     GetClientAbsOrigin(target, pos);
@@ -4290,8 +4275,9 @@ public Action:HaleTimer(Handle:hTimer)
 public Action:HHHTeleTimer(Handle:timer)
 {
     if (IsValidClient(Hale))
+    {
         SetEntProp(Hale, Prop_Send, "m_CollisionGroup", 5); //Fix HHH's clipping.
-    hHHHTeleTimer = INVALID_HANDLE;
+    }
 }
 
 public Action:Timer_StunHHH(Handle:timer, Handle:pack)
@@ -6115,7 +6101,7 @@ bool:GetClientClasshelpinfoCookie(client)
     if (!IsValidClient(client)) return false;
     if (IsFakeClient(client)) return false;
     if (!AreClientCookiesCached(client)) return true;
-    decl String:strCookie[32];
+    decl String:strCookie[MAX_DIGITS];
     GetClientCookie(client, ClasshelpinfoCookie, strCookie, sizeof(strCookie));
     if (strCookie[0] == 0) return true;
     else return bool:StringToInt(strCookie);
@@ -6128,7 +6114,7 @@ GetClientQueuePoints(client)
         return botqueuepoints;
     }
     if (!AreClientCookiesCached(client)) return 0;
-    decl String:strPoints[32];
+    decl String:strPoints[MAX_DIGITS];
     GetClientCookie(client, PointCookie, strPoints, sizeof(strPoints));
     return StringToInt(strPoints);
 }
@@ -6137,13 +6123,13 @@ SetClientQueuePoints(client, points)
     if (!IsValidClient(client)) return;
     if (IsFakeClient(client)) return;
     if (!AreClientCookiesCached(client)) return;
-    decl String:strPoints[32];
+    decl String:strPoints[MAX_DIGITS];
     IntToString(points, strPoints, sizeof(strPoints));
     SetClientCookie(client, PointCookie, strPoints);
 }
 SetAuthIdQueuePoints(String:authid[], points)
 {
-    decl String:strPoints[32];
+    decl String:strPoints[MAX_DIGITS];
     IntToString(points, strPoints, sizeof(strPoints));
     SetAuthIdCookie(authid, PointCookie, strPoints);
 }
@@ -7680,82 +7666,135 @@ stock FindPlayerBack(client, indices[], len = sizeof(indices))
 }
 
 /*
-    This isn't really perfected yet logic wise, but works for my purposes.
+    PriorityCenterText (Version 0x04)
 
-    Intended use: Give priority to CenterText messages that fire only once.
-                  Don't give priority to repeatedly displaying CenterText (such as when Hale's health is displayed to the last player)
+    Only one message can be shown in center text at a time.
+    These stocks allow that space to be given different priority levels that prevent new messages from overwriting what's there.
 
-    Main use: Give priority to the more 'special' events (HHH teleport, market gardens, telefrags, and backstabs)
+    By: Chdata
+
 */
-static bool:g_bOverwrite[TF_MAX_PLAYERS] = {false,...}; // TODO: Set false on client connect
-stock PriorityCenterText(iClient, bool:bPriority = false, const String:format[], any:...)
+static s_iLastPriority[TF_MAX_PLAYERS] = {MIN_INT,...};
+static Handle:s_hPCTTimer[TF_MAX_PLAYERS] = {INVALID_HANDLE,...};
+
+/*
+    An example of how to use this:
+
+    PriorityCenterText(iClient, GetClientImmunityLevel(iClient), "My message's priority depends on my immunity level.");
+
+    IF old priority == new priority THEN old message is overwritten by new message.
+
+*/
+stock PriorityCenterText(iClient, iPriority = MIN_INT, const String:szFormat[], any:...)
 {
-    if (!bPriority && g_bOverwrite[iClient])
+    if (!IsValidClient(iClient))
+    {
+        ThrowError("Client index %i is invalid or not in game.", iClient);
+    }
+
+    if (s_iLastPriority[iClient] > iPriority)
     {
         return;
     }
 
-    if (!g_bOverwrite[iClient] && bPriority)
+    if (iPriority > s_iLastPriority[iClient])
     {
-        g_bOverwrite[iClient] = true;
-        CreateTimer(5.0, EndPriorityCenterText, GetClientUserId(iClient), TIMER_FLAG_NO_MAPCHANGE);
+        ClearTimer(s_hPCTTimer[iClient]);
+        s_hPCTTimer[iClient] = CreateTimer(5.0, RevertPriorityCenterText, GetClientUserId(iClient), TIMER_FLAG_NO_MAPCHANGE);
+
+        s_iLastPriority[iClient] = iPriority;
     }
 
-    decl String:buffer[MAX_CENTER_TEXT];
+    decl String:szBuffer[MAX_CENTER_TEXT];
     SetGlobalTransTarget(iClient);
-    VFormat(buffer, sizeof(buffer), format, 4);
-    PrintCenterText(iClient, "%s", buffer);
+    VFormat(szBuffer, sizeof(szBuffer), szFormat, 4);
+    PrintCenterText(iClient, "%s", szBuffer);
 }
 
-stock PriorityCenterTextAll(bool:bPriority = false, const String:format[], any:...)
+/*
+    Send priority center text to everyone.
+    This will obey priority sent to via PriorityCenterText() and not overwrite if it's lower priority
+*/
+stock PriorityCenterTextAll(iPriority = MIN_INT, const String:szFormat[], any:...)
 {
-    if (!bPriority && g_bOverwrite[0])
-    {
-        return;
-    }
-
-    if (!g_bOverwrite[0] && bPriority)
-    {
-        for (new i = 0; i <= MaxClients; i++)
-        {
-            g_bOverwrite[i] = true;
-        }
-        CreateTimer(5.0, EndPriorityCenterText, -1, TIMER_FLAG_NO_MAPCHANGE);
-    }
-
-    decl String:buffer[MAX_CENTER_TEXT];
+    decl String:szBuffer[MAX_CENTER_TEXT];
 
     for (new i = 1; i <= MaxClients; i++)
     {
         if (IsClientInGame(i))
         {
             SetGlobalTransTarget(i);
-            VFormat(buffer, sizeof(buffer), format, 3);
-            PrintCenterText(i, "%s", buffer);
-            //PriorityCenterText(i, bPriority, "%s", buffer);
+            VFormat(szBuffer, sizeof(szBuffer), szFormat, 3);
+            PriorityCenterText(i, iPriority, "%s", szBuffer);
         }
     }
 }
 
-public Action:EndPriorityCenterText(Handle:hTimer, any:Data)
+/*
+    Send priority center text to everyone.
+    This version bypasses the priority in PriorityCenterText() with its own internal counter.
+
+    This version will ALWAYS have higher priority than the functions above, so long as it has higher priority than 'itself'
+
+    The priority of all players will be completely maxed out to achieve this.
+*/
+stock PriorityCenterTextAllEx(iPriority = -2147483647, const String:szFormat[], any:...) // -2147483647 == MIN_INT+1
 {
-    if (Data == -1)
+    if (iPriority == MIN_INT)
     {
-        for (new i = 0; i <= MaxClients; i++)
-        {
-            g_bOverwrite[i] = false;
-        }
+        iPriority++;
     }
-    else
+
+    if (s_iLastPriority[0] > iPriority)
     {
-        new iClient = GetClientOfUserId(Data);
-        if (IsValidClient(iClient))
+        return;
+    }
+
+    if (iPriority > s_iLastPriority[0])
+    {
+        ClearTimer(s_hPCTTimer[0]);
+        s_hPCTTimer[0] = CreateTimer(5.0, RevertPriorityCenterText, -1, TIMER_FLAG_NO_MAPCHANGE);
+
+        s_iLastPriority[0] = iPriority;
+
+        for (new i = 1; i <= MaxClients; i++) // Our loop includes [0] (console)
         {
-            g_bOverwrite[iClient] = false;
+            s_iLastPriority[i] = MAX_INT;
         }
     }
 
-    return Plugin_Continue;
+    decl String:szBuffer[MAX_CENTER_TEXT];
+
+    for (new i = 1; i <= MaxClients; i++)
+    {
+        if (IsClientInGame(i))
+        {
+            SetGlobalTransTarget(i);
+            VFormat(szBuffer, sizeof(szBuffer), szFormat, 3);
+            PrintCenterText(i, "%s", szBuffer);
+        }
+    }
+}
+
+public Action:RevertPriorityCenterText(Handle:hTimer, any:UserId)
+{
+    if (UserId == -1) // "All"
+    {
+        for (new i = 0; i <= MaxClients; i++)
+        {
+            s_iLastPriority[i] = MIN_INT;
+        }
+        s_hPCTTimer[0] = INVALID_HANDLE;
+    }
+    else
+    {
+        new iClient = GetClientOfUserId(UserId);
+        if (iClient && IsClientInGame(iClient))
+        {
+            s_iLastPriority[iClient] = MIN_INT;
+            s_hPCTTimer[iClient] = INVALID_HANDLE;
+        }
+    }
 }
 
 /*
@@ -7790,7 +7829,7 @@ stock bool:IsDate(StartMonth = Month_None, StartDay = 0, EndMonth = Month_None, 
     if (!bFound)
     {
         new iTimeStamp = GetTime();
-        decl String:szMonth[32], String:szDate[32];
+        decl String:szMonth[MAX_DIGITS], String:szDate[MAX_DIGITS];
 
         FormatTime(szMonth, sizeof(szMonth), "%m", iTimeStamp);
         FormatTime(szDate, sizeof(szDate),   "%d", iTimeStamp);
@@ -8225,4 +8264,13 @@ stock bool:IsReplayClient(iClient)
 stock TF2_GetRoundWinCount()
 {
     return GetTeamScore(TEAM_RED) + GetTeamScore(TEAM_BLU);
+}
+
+stock ClearTimer(&Handle:hTimer)
+{
+    if (hTimer != INVALID_HANDLE)
+    {
+        KillTimer(hTimer);
+        hTimer = INVALID_HANDLE;
+    }
 }

@@ -413,6 +413,6 @@
 	"vsh_last_update"
 	{
 		"#format" "{1:s},{2:s}"
-		"en"	"What's new in v.{olive}{1}{default} ({olive}{2}{default})? Type {olive}/halenew{default}"
+		"en"	"What's new in v{olive}{1}{default} ({olive}{2}{default})? Type {olive}/halenew{default}"
 	}
 }
