@@ -7700,7 +7700,7 @@ stock PriorityCenterText(iClient, iPriority = MIN_INT, const String:szFormat[], 
     if (iPriority > s_iLastPriority[iClient])
     {
         ClearTimer(s_hPCTTimer[iClient]);
-        s_hPCTTimer[iClient] = CreateTimer(5.0, RevertPriorityCenterText, GetClientUserId(iClient));
+        s_hPCTTimer[iClient] = CreateTimer(5.0, RevertPriorityCenterText, iClient);
 
         s_iLastPriority[iClient] = iPriority;
     }
@@ -7776,9 +7776,9 @@ stock PriorityCenterTextAllEx(iPriority = -2147483647, const String:szFormat[], 
     }
 }
 
-public Action:RevertPriorityCenterText(Handle:hTimer, any:UserId)
+public Action:RevertPriorityCenterText(Handle:hTimer, any:Client)
 {
-    if (UserId == -1) // "All"
+    if (Client == -1) // "All"
     {
         for (new i = 0; i <= MaxClients; i++)
         {
@@ -7788,12 +7788,8 @@ public Action:RevertPriorityCenterText(Handle:hTimer, any:UserId)
     }
     else
     {
-        new iClient = GetClientOfUserId(UserId);
-        if (iClient && IsClientInGame(iClient))
-        {
-            s_iLastPriority[iClient] = MIN_INT;
-            s_hPCTTimer[iClient] = INVALID_HANDLE;
-        }
+        s_iLastPriority[Client] = MIN_INT;
+        s_hPCTTimer[Client] = INVALID_HANDLE;
     }
 }
 
