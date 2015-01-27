@@ -7700,7 +7700,7 @@ stock PriorityCenterText(iClient, iPriority = MIN_INT, const String:szFormat[], 
     if (iPriority > s_iLastPriority[iClient])
     {
         ClearTimer(s_hPCTTimer[iClient]);
-        s_hPCTTimer[iClient] = CreateTimer(5.0, RevertPriorityCenterText, GetClientUserId(iClient), TIMER_FLAG_NO_MAPCHANGE);
+        s_hPCTTimer[iClient] = CreateTimer(5.0, RevertPriorityCenterText, GetClientUserId(iClient));
 
         s_iLastPriority[iClient] = iPriority;
     }
@@ -7753,7 +7753,7 @@ stock PriorityCenterTextAllEx(iPriority = -2147483647, const String:szFormat[], 
     if (iPriority > s_iLastPriority[0])
     {
         ClearTimer(s_hPCTTimer[0]);
-        s_hPCTTimer[0] = CreateTimer(5.0, RevertPriorityCenterText, -1, TIMER_FLAG_NO_MAPCHANGE);
+        s_hPCTTimer[0] = CreateTimer(5.0, RevertPriorityCenterText, -1);
 
         s_iLastPriority[0] = iPriority;
 
