@@ -95,7 +95,7 @@
 		"#format" "{1:i}"
 		"en"	"Damage dealt: {1}"
 	}
-	"vsh_damage_own"
+	"vsh_damage_2"
 	{
 		"en"	"Damage"
 	}
