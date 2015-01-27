@@ -3730,15 +3730,15 @@ public Action:ClientTimer(Handle:hTimer)
                 new obstarget = GetEntPropEnt(client, Prop_Send, "m_hObserverTarget");
                 if (obstarget != Hale && IsValidClient(obstarget) && obstarget != client)
                 {
-                    if (!(GetClientButtons(client) & IN_SCORE)) ShowSyncHudText(client, rageHUD, "Damage: %d - %N's Damage: %d", Damage[client], obstarget, Damage[obstarget]);
+                    if (!(GetClientButtons(client) & IN_SCORE)) ShowSyncHudText(client, rageHUD, "%t: %d - %N's %t: %d", "vsh_damage_2", Damage[client], obstarget, "vsh_damage_2", Damage[obstarget]);
                 }
                 else
                 {
-                    if (!(GetClientButtons(client) & IN_SCORE)) ShowSyncHudText(client, rageHUD, "Damage: %d", Damage[client]);
+                    if (!(GetClientButtons(client) & IN_SCORE)) ShowSyncHudText(client, rageHUD, "%t: %d", "vsh_damage_2", Damage[client]);
                 }
                 continue;
             }
-            if (!(GetClientButtons(client) & IN_SCORE)) ShowSyncHudText(client, rageHUD, "Damage: %d", Damage[client]);
+            if (!(GetClientButtons(client) & IN_SCORE)) ShowSyncHudText(client, rageHUD, "%t: %d", "vsh_damage_2", Damage[client]);
             new TFClassType:class = TF2_GetPlayerClass(client);
             new weapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
             if (weapon <= MaxClients || !IsValidEntity(weapon) || !GetEdictClassname(weapon, wepclassname, sizeof(wepclassname))) strcopy(wepclassname, sizeof(wepclassname), "");
