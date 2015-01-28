@@ -80,9 +80,13 @@
 	{
 		"ru"  "Твой урон составил: {1}"
 	}
-	"vsh_damage_2"
+	"vsh_damage_own"
 	{
 		"ru"	"Урон"
+	}
+	"vsh_damage_others"
+	{
+		"ru"	"Урон: {1} - Урон {2}: {3}"
 	}
 	"vsh_point_enable"
 	{
